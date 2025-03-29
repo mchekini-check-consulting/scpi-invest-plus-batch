@@ -11,8 +11,7 @@ import fr.formationacademy.scpiinvestplusbatch.repository.ScpiRepository;
 import fr.formationacademy.scpiinvestplusbatch.service.BatchService;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -26,34 +25,50 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.support.CompositeItemProcessor;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import javax.sql.DataSource;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Configuration
 @EnableBatchProcessing
 @EnableScheduling
 @RequiredArgsConstructor
+@Slf4j
 public class BatchConfig {
 
-    private static final Logger log = LoggerFactory.getLogger(BatchConfig.class);
-
-    private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
     private final EntityManagerFactory entityManagerFactory;
     private final BatchJobListener batchJobListener;
     private final ScpiItemReader scpiItemReader;
     private final ScpiRepository scpiRepository;
+    @Lazy
+    private final JobRepository jobRepository;
+
+    @Bean
+    public PlatformTransactionManager batchManager(
+            @Qualifier("batchManager") PlatformTransactionManager transactionManager) {
+        return transactionManager;
+    }
+
+    @Bean
+    @Primary
+    public DataSource dataSource() {
+        return DataSourceBuilder.create().build();
+    }
 
     @Bean
     public CompositeItemProcessor<ScpiDto, Scpi> processor(ScpiItemProcessor scpiItemProcessor, BatchService batchService) {
@@ -68,6 +83,13 @@ public class BatchConfig {
         compositeProcessor.setDelegates(Arrays.asList(encodingProcessor, conversionProcessor));
 
         return compositeProcessor;
+    }
+
+    @Bean
+    @Primary
+    public PlatformTransactionManager transactionManager(
+            @Qualifier("batchEntityManagerFactory") LocalContainerEntityManagerFactoryBean entityManagerFactory) {
+        return new JpaTransactionManager(Objects.requireNonNull(entityManagerFactory.getObject()));
     }
 
     @Bean

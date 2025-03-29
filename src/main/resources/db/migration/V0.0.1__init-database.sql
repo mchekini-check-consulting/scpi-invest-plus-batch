@@ -1,72 +1,53 @@
-CREATE TABLE investor
-(
-    last_name          varchar,
-    first_name         varchar,
-    date_of_birth      date,
-    email              text PRIMARY KEY,
-    annual_income      integer,
-    phone_number       varchar(10),
-    marital_status     varchar,
-    number_of_children varchar
+CREATE TABLE investor (
+    last_name          VARCHAR,
+    first_name         VARCHAR,
+    date_of_birth      DATE,
+    email              TEXT PRIMARY KEY,
+    annual_income      INTEGER,
+    phone_number       VARCHAR(10),
+    marital_status     VARCHAR,
+    number_of_children VARCHAR
 );
 
-CREATE TABLE location
-(
-    country            varchar,
-    country_percentage float,
-    scpi_id            integer,
-    PRIMARY KEY (country, scpi_id)
-);
-
-CREATE TABLE sector
-(
-    name              varchar,
-    sector_percentage float,
-    scpi_id           integer,
-    PRIMARY KEY (name, scpi_id)
-);
-
-CREATE TABLE scpi
-(
+CREATE TABLE scpi (
     id                   SERIAL PRIMARY KEY,
-    name                 varchar,
-    minimum_subscription integer,
-    manager              varchar,
+    name                 VARCHAR,
+    minimum_subscription INTEGER,
+    manager              VARCHAR,
     capitalization       BIGINT,
-    subscription_fees    float,
-    management_costs     float,
-    enjoyment_delay      integer,
-    iban                 varchar UNIQUE,
-    bic                  varchar,
-    scheduled_payment    bool,
-    cashback             float,
-    advertising          text,
-    frequency_payment    varchar
+    subscription_fees    NUMERIC(10,2),
+    management_costs     NUMERIC(10,2),
+    enjoyment_delay      INTEGER,
+    iban                 VARCHAR UNIQUE,
+    bic                  VARCHAR,
+    scheduled_payment    BOOLEAN,
+    cashback             FLOAT,
+    advertising          TEXT,
+    frequency_payment    VARCHAR
 );
 
-CREATE TABLE stat_year
-(
-    year_stat            integer,
-    distribution_rate    float,
-    share_price          float,
-    reconstitution_value float,
-    scpi_id              integer,
-    PRIMARY KEY (year_stat, scpi_id)
+CREATE TABLE location (
+    country            VARCHAR,
+    country_percentage NUMERIC(10,2),
+    scpi_id            INTEGER,
+    PRIMARY KEY (country, scpi_id),
+    FOREIGN KEY (scpi_id) REFERENCES scpi (id) ON DELETE CASCADE
 );
 
-ALTER TABLE location
-    ADD FOREIGN KEY (scpi_id) REFERENCES scpi (id) ON DELETE CASCADE;
+CREATE TABLE sector (
+    name              VARCHAR,
+    sector_percentage NUMERIC(10,2),
+    scpi_id           INTEGER,
+    PRIMARY KEY (name, scpi_id),
+    FOREIGN KEY (scpi_id) REFERENCES scpi (id) ON DELETE CASCADE
+);
 
-ALTER TABLE sector
-    ADD FOREIGN KEY (scpi_id) REFERENCES scpi (id) ON DELETE CASCADE;
-
-ALTER TABLE stat_year
-    ADD FOREIGN KEY (scpi_id) REFERENCES scpi (id) ON DELETE CASCADE;
-
-ALTER TABLE scpi ALTER COLUMN subscription_fees TYPE NUMERIC(10,2);
-ALTER TABLE scpi ALTER COLUMN management_costs TYPE NUMERIC(10,2);
-ALTER TABLE location ALTER COLUMN country_percentage TYPE NUMERIC(10,2);
-ALTER TABLE sector ALTER COLUMN sector_percentage TYPE NUMERIC(10,2);
-ALTER TABLE stat_year ALTER COLUMN distribution_rate TYPE NUMERIC(10,2);
-ALTER TABLE stat_year ALTER COLUMN share_price TYPE NUMERIC(10,2);
-ALTER TABLE stat_year ALTER COLUMN reconstitution_value TYPE NUMERIC(10,2);
+CREATE TABLE stat_year (
+    year_stat            INTEGER,
+    distribution_rate    NUMERIC(10,2),
+    share_price          NUMERIC(10,2),
+    reconstitution_value NUMERIC(10,2),
+    scpi_id              INTEGER,
+    PRIMARY KEY (year_stat, scpi_id),
+    FOREIGN KEY (scpi_id) REFERENCES scpi (id) ON DELETE CASCADE
+);

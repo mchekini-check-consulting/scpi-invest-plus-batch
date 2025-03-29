@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -26,6 +27,7 @@ public class StatYearService {
 
     private final StatYearRepository statYearRepository;
 
+    @Transactional("appTransactionManager")
     public List<StatYear> createStatYears(ScpiDto scpiDto, Scpi scpi) {
         List<StatYear> statYears = new ArrayList<>();
 

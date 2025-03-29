@@ -4,7 +4,9 @@ import fr.formationacademy.scpiinvestplusbatch.dto.BatchDataDto;
 import fr.formationacademy.scpiinvestplusbatch.dto.ScpiDto;
 import fr.formationacademy.scpiinvestplusbatch.entity.Scpi;
 import fr.formationacademy.scpiinvestplusbatch.repository.ScpiRepository;
-import jakarta.transaction.Transactional;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,7 +25,11 @@ public class BatchService {
 
     private final ScpiRepository scpiRepository;
 
-    @Transactional
+    @PersistenceContext(unitName = "appEntityManagerFactory")
+    private EntityManager entityManager;
+
+
+    @Transactional("appTransactionManager")
     public void saveOrUpdateBatchData(List<BatchDataDto> batchDataList) {
         if (batchDataList == null || batchDataList.isEmpty()) {
             log.debug("Batch data list is empty. Skipping processing.");

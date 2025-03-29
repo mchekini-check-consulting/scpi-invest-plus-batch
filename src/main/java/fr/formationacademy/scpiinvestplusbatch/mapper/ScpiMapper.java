@@ -11,12 +11,14 @@ import fr.formationacademy.scpiinvestplusbatch.entity.StatYear;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
+import org.springframework.stereotype.Component;
 
 import java.util.Comparator;
 import java.util.List;
 
 
 @Mapper(componentModel = "spring")
+@Component
 public interface ScpiMapper {
 
     @Mapping(target = "statYear", source = "statYears", qualifiedByName = "firstStatYear")

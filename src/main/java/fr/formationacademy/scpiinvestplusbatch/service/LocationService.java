@@ -4,12 +4,12 @@ import fr.formationacademy.scpiinvestplusbatch.dto.LocationRequest;
 import fr.formationacademy.scpiinvestplusbatch.entity.Location;
 import fr.formationacademy.scpiinvestplusbatch.entity.LocationId;
 import fr.formationacademy.scpiinvestplusbatch.entity.Scpi;
-import fr.formationacademy.scpiinvestplusbatch.mapper.EntityMapper;
+import fr.formationacademy.scpiinvestplusbatch.mapper.LocationMapper;
 import fr.formationacademy.scpiinvestplusbatch.repository.LocationRepository;
 import io.micrometer.common.util.StringUtils;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -21,13 +21,18 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class LocationService {
 
     private final LocationRepository locationRepository;
-    private final EntityMapper locationMapper;
+    private final LocationMapper locationMapper;
 
+    public LocationService(LocationRepository locationRepository, LocationMapper locationMapper) {
+        this.locationRepository = locationRepository;
+        this.locationMapper = locationMapper;
+    }
+
+    @Transactional("appTransactionManager")
     public List<Location> createLocations(String localisationData, Scpi scpi) {
         if (StringUtils.isBlank(localisationData)) {
             log.debug("Aucune localisation fournie pour la SCPI: {}", scpi.getName());
