@@ -1,11 +1,11 @@
 package fr.formationacademy.scpiinvestplusbatch.service;
 
 import fr.formationacademy.scpiinvestplusbatch.dto.LocationRequest;
-import fr.formationacademy.scpiinvestplusbatch.entity.Location;
-import fr.formationacademy.scpiinvestplusbatch.entity.LocationId;
-import fr.formationacademy.scpiinvestplusbatch.entity.Scpi;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.Location;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.LocationId;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.Scpi;
 import fr.formationacademy.scpiinvestplusbatch.mapper.LocationMapper;
-import fr.formationacademy.scpiinvestplusbatch.repository.LocationRepository;
+import fr.formationacademy.scpiinvestplusbatch.repository.postgres.LocationRepository;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -32,7 +32,7 @@ public class LocationService {
         this.locationMapper = locationMapper;
     }
 
-    @Transactional("appTransactionManager")
+    @Transactional
     public List<Location> createLocations(String localisationData, Scpi scpi) {
         if (StringUtils.isBlank(localisationData)) {
             log.debug("Aucune localisation fournie pour la SCPI: {}", scpi.getName());

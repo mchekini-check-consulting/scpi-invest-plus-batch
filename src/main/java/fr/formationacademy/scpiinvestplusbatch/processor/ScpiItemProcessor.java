@@ -3,11 +3,11 @@ package fr.formationacademy.scpiinvestplusbatch.processor;
 
 import fr.formationacademy.scpiinvestplusbatch.dto.BatchDataDto;
 import fr.formationacademy.scpiinvestplusbatch.dto.ScpiDto;
-import fr.formationacademy.scpiinvestplusbatch.entity.Location;
-import fr.formationacademy.scpiinvestplusbatch.entity.Scpi;
-import fr.formationacademy.scpiinvestplusbatch.entity.Sector;
-import fr.formationacademy.scpiinvestplusbatch.entity.StatYear;
-import fr.formationacademy.scpiinvestplusbatch.repository.ScpiRepository;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.Location;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.Scpi;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.Sector;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.StatYear;
+import fr.formationacademy.scpiinvestplusbatch.repository.postgres.ScpiRepository;
 import fr.formationacademy.scpiinvestplusbatch.service.LocationService;
 import fr.formationacademy.scpiinvestplusbatch.service.SectorService;
 import fr.formationacademy.scpiinvestplusbatch.service.StatYearService;
@@ -76,9 +76,7 @@ public class ScpiItemProcessor implements ItemProcessor<BatchDataDto, Scpi> {
         List<StatYear> statYears = statYearService.createStatYears(dto, scpi);
         statYearService.saveStatYears(statYears);
         scpi.setStatYears(statYears);
-
         refreshCache();
-
         return scpi;
     }
 

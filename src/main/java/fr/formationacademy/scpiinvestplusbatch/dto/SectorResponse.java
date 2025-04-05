@@ -1,11 +1,11 @@
 package fr.formationacademy.scpiinvestplusbatch.dto;
 
-
-import fr.formationacademy.scpiinvestplusbatch.entity.LocationId;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.SectorId;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 
 import java.math.BigDecimal;
 
@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Data
 @Builder
-public class LocationDtoOut {
-    private LocationId id;
-    private BigDecimal countryPercentage;
+public class SectorResponse {
+    private SectorId id;
+    private BigDecimal sectorPercentage;
 }

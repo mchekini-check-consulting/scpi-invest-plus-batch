@@ -1,7 +1,7 @@
 package fr.formationacademy.scpiinvestplusbatch.mapper;
 
 import fr.formationacademy.scpiinvestplusbatch.dto.LocationRequest;
-import fr.formationacademy.scpiinvestplusbatch.entity.Location;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.Location;
 import org.mapstruct.Mapper;
 import org.springframework.stereotype.Component;
 

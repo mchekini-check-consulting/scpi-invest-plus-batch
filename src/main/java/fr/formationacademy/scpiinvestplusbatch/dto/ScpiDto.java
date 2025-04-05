@@ -1,6 +1,6 @@
 package fr.formationacademy.scpiinvestplusbatch.dto;
 
-import fr.formationacademy.scpiinvestplusbatch.entity.StatYear;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.StatYear;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

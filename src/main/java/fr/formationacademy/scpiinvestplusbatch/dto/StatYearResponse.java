@@ -1,6 +1,6 @@
 package fr.formationacademy.scpiinvestplusbatch.dto;
 
-import fr.formationacademy.scpiinvestplusbatch.entity.StatYearId;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.StatYearId;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Data
 @Builder
-public class StatYearDtoOut {
+public class StatYearResponse {
     private StatYearId yearStat;
     private BigDecimal distributionRate;
     private BigDecimal sharePrice;

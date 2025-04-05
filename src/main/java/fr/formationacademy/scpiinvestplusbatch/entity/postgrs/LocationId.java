@@ -1,24 +1,19 @@
-package fr.formationacademy.scpiinvestplusbatch.entity;
+package fr.formationacademy.scpiinvestplusbatch.entity.postgrs;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Embeddable
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
-public class SectorId implements java.io.Serializable {
-
-    @Column(name = "scpi_id")
+public class LocationId implements Serializable {
     private Integer scpiId;
-
-    @Column(name = "name")
-    private String name;
-
-
+    private String country;
 }

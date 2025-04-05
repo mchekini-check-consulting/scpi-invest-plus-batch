@@ -1,7 +1,7 @@
 package fr.formationacademy.scpiinvestplusbatch.mapper;
 
 import fr.formationacademy.scpiinvestplusbatch.dto.SectorRequest;
-import fr.formationacademy.scpiinvestplusbatch.entity.Sector;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.Sector;
 import org.mapstruct.Mapper;
 import org.springframework.stereotype.Component;
 

@@ -1,6 +1,6 @@
-package fr.formationacademy.scpiinvestplusbatch.repository;
+package fr.formationacademy.scpiinvestplusbatch.repository.postgres;
 
-import fr.formationacademy.scpiinvestplusbatch.entity.Scpi;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.Scpi;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

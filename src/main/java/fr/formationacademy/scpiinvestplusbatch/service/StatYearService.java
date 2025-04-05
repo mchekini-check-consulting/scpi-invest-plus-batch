@@ -1,10 +1,10 @@
 package fr.formationacademy.scpiinvestplusbatch.service;
 
 import fr.formationacademy.scpiinvestplusbatch.dto.ScpiDto;
-import fr.formationacademy.scpiinvestplusbatch.entity.Scpi;
-import fr.formationacademy.scpiinvestplusbatch.entity.StatYear;
-import fr.formationacademy.scpiinvestplusbatch.entity.StatYearId;
-import fr.formationacademy.scpiinvestplusbatch.repository.StatYearRepository;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.Scpi;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.StatYear;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.StatYearId;
+import fr.formationacademy.scpiinvestplusbatch.repository.postgres.StatYearRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -27,7 +27,7 @@ public class StatYearService {
 
     private final StatYearRepository statYearRepository;
 
-    @Transactional("appTransactionManager")
+    @Transactional
     public List<StatYear> createStatYears(ScpiDto scpiDto, Scpi scpi) {
         List<StatYear> statYears = new ArrayList<>();
 

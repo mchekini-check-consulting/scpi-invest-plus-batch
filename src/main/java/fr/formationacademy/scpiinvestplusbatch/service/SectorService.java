@@ -1,11 +1,11 @@
 package fr.formationacademy.scpiinvestplusbatch.service;
 
 import fr.formationacademy.scpiinvestplusbatch.dto.SectorRequest;
-import fr.formationacademy.scpiinvestplusbatch.entity.Scpi;
-import fr.formationacademy.scpiinvestplusbatch.entity.Sector;
-import fr.formationacademy.scpiinvestplusbatch.entity.SectorId;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.Scpi;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.Sector;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.SectorId;
 import fr.formationacademy.scpiinvestplusbatch.mapper.SectorMapper;
-import fr.formationacademy.scpiinvestplusbatch.repository.SectorRepository;
+import fr.formationacademy.scpiinvestplusbatch.repository.postgres.SectorRepository;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,7 +31,7 @@ public class SectorService{
         this.sectorMapper = sectorMapper;
     }
 
-    @Transactional("appTransactionManager")
+    @Transactional
     public List<Sector> createSectors(String sectorData, Scpi scpi) {
         if (StringUtils.isBlank(sectorData)) {
             log.debug("Aucun secteur fourni pour la SCPI: {}", scpi.getName());

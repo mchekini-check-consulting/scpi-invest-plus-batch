@@ -17,7 +17,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class BatchItemWriter implements ItemWriter<BatchDataDto> {
+public class PostgresItemWriter implements ItemWriter<BatchDataDto> {
 
     private final BatchService batchService;
     private final LocationService locationService;
@@ -32,9 +32,7 @@ public class BatchItemWriter implements ItemWriter<BatchDataDto> {
         List<BatchDataDto> batchDataList = items.getItems().stream()
                 .map(item -> (BatchDataDto) item)
                 .toList();
-
         batchService.saveOrUpdateBatchData(batchDataList);
-
         batchDataList.forEach(batchData -> {
             if (batchData.getLocations() != null) {
                 locationService.saveLocations(batchData.getLocations());
@@ -46,6 +44,7 @@ public class BatchItemWriter implements ItemWriter<BatchDataDto> {
                 statYearService.saveStatYears(batchData.getStatYears());
             }
         });
+
         log.info("{} SCPI enregistrées en base", batchDataList.size());
     }
 }

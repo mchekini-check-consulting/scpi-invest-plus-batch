@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @Builder
-public class ScpiDtoOut {
+public class ScpiResponse {
     private Integer id;
     private String name;
     private Integer minimumSubscription;
@@ -26,10 +26,10 @@ public class ScpiDtoOut {
     private String frequencyPayment;
     private Float cashback;
     private String advertising;
-    private List<StatYearDtoOut> statYears;
-    private List<LocationDtoOut> locations;
-    private List<SectorDtoOut> sectors;
-    private LocationDtoOut location;
-    private SectorDtoOut sector;
-    private StatYearDtoOut statYear;
+    private List<StatYearResponse> statYears;
+    private List<LocationResponse> locations;
+    private List<SectorResponse> sectors;
+    private LocationResponse location;
+    private SectorResponse sector;
+    private StatYearResponse statYear;
 }

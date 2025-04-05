@@ -1,4 +1,4 @@
-package fr.formationacademy.scpiinvestplusbatch.entity;
+package fr.formationacademy.scpiinvestplusbatch.entity.postgrs;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
