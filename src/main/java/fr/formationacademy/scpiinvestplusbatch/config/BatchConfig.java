@@ -22,6 +22,7 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JpaItemWriter;
+import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.support.CompositeItemProcessor;
 import org.springframework.batch.item.support.CompositeItemWriter;
 import org.springframework.context.annotation.Bean;
@@ -102,7 +103,6 @@ public class BatchConfig {
     public ItemWriter<Scpi> compositeWriter() {
         CompositeItemWriter<Scpi> compositeItemWriter = new CompositeItemWriter<>();
         List<ItemWriter<? super Scpi>> writers = new ArrayList<>();
-        writers.add(jpaWriter());
         writers.add(mongoItemWriter);
         writers.add(elasticItemWriter);
 
@@ -111,10 +111,20 @@ public class BatchConfig {
     }
 
     @Bean
+    public JpaPagingItemReader<Scpi> scpiPostgresReader() {
+        JpaPagingItemReader<Scpi> reader = new JpaPagingItemReader<>();
+        reader.setEntityManagerFactory(entityManagerFactory);
+        reader.setQueryString("SELECT s FROM Scpi s");
+        reader.setPageSize(20);
+        return reader;
+    }
+
+    @Bean
     public Step deleteStep() {
         return new StepBuilder("deleteStep", jobRepository)
                 .tasklet(deleteMissingScpiTasklet, transactionManager)
                 .build();
+
     }
 
     @Bean
@@ -123,6 +133,18 @@ public class BatchConfig {
                 .<ScpiDto, Scpi>chunk(20, transactionManager)
                 .reader(scpiItemReader.reader())
                 .processor(processor())
+                .writer(jpaWriter())
+                .faultTolerant()
+                .skip(Exception.class)
+                .skipLimit(100)
+                .build();
+    }
+
+    @Bean
+    public Step updateMongoElasticStep() {
+        return new StepBuilder("updateMongoElasticStep", jobRepository)
+                .<Scpi, Scpi>chunk(20, transactionManager)
+                .reader(scpiPostgresReader())
                 .writer(compositeWriter())
                 .faultTolerant()
                 .skip(Exception.class)
@@ -136,7 +158,8 @@ public class BatchConfig {
                 .listener(batchJobListener)
                 .incrementer(new RunIdIncrementer())
                 .start(deleteStep())
-                .next(importStep())
+                .start(importStep())
+                .next(updateMongoElasticStep())
                 .build();
     }
 }
