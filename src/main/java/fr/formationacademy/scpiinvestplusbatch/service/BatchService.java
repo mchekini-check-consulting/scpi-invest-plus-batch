@@ -71,31 +71,27 @@ public class BatchService {
 
     @Transactional
     public void saveToMongo(Scpi scpi) {
-
-        Optional<fr.formationacademy.scpiinvestplusbatch.entity.mongo.ScpiDocument> existing = scpiMongoRepository.findByName(scpi.getName());
-        BigDecimal sharePrice = scpi.getStatYears().isEmpty() ? null : scpi.getStatYears().get(0).getSharePrice();
-
-        fr.formationacademy.scpiinvestplusbatch.entity.mongo.ScpiDocument document = fr.formationacademy.scpiinvestplusbatch.entity.mongo.ScpiDocument.builder()
-                .scpiId(scpi.getId())
-                .name(scpi.getName())
-                .iban(scpi.getIban())
-                .bic(scpi.getBic())
-                .sharePrice(sharePrice)
-                .build();
+        Optional<fr.formationacademy.scpiinvestplusbatch.entity.mongo.ScpiDocument> existing =
+                scpiMongoRepository.findByName(scpi.getName());
 
         if (existing.isPresent()) {
-            fr.formationacademy.scpiinvestplusbatch.entity.mongo.ScpiDocument existingDoc = existing.get();
-            if (isSame(document, existingDoc)) {
-                return;
-            } else {
-                document.setId(existingDoc.getId());
-                log.info("SCPI '{}' déjà présente mais différente, mise à jour dans MongoDB...", scpi.getName());
-            }
-        } else {
-            log.info("SCPI '{}' absente de MongoDB, insertion en cours...", scpi.getName());
+            log.info("SCPI '{}' déjà présente dans MongoDB, aucune insertion effectuée.", scpi.getName());
+            return;
         }
 
+        BigDecimal sharePrice = scpi.getStatYears().isEmpty() ? null : scpi.getStatYears().get(0).getSharePrice();
+
+        fr.formationacademy.scpiinvestplusbatch.entity.mongo.ScpiDocument document =
+                fr.formationacademy.scpiinvestplusbatch.entity.mongo.ScpiDocument.builder()
+                        .scpiId(scpi.getId())
+                        .name(scpi.getName())
+                        .iban(scpi.getIban())
+                        .bic(scpi.getBic())
+                        .sharePrice(sharePrice)
+                        .build();
+
         scpiMongoRepository.save(document);
+
         long scpiCount = scpiMongoRepository.count();
         log.info("Nombre total de SCPI chargées dans MongoDB : {}", scpiCount);
     }

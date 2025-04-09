@@ -4,6 +4,7 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.transport.endpoints.BooleanResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -91,7 +92,9 @@ public class ScpiIndexService {
                               "keyword": { "type": "keyword" }
                             }
                           },
-                          "sectorPercentage": { "type": "float" }
+                          "sectorPercentage": { "type": "scaled_float"
+                                                "scaling_factor": 100
+                          }
                         }
                       },
                       "locations": {
@@ -129,7 +132,7 @@ public class ScpiIndexService {
         );
     }
 
-     void createIndexIfNotExists() throws IOException {
+    void createIndexIfNotExists() throws IOException {
         BooleanResponse indexExistsResponse = elasticsearchClient.indices().exists(b -> b.index(INDEX_NAME));
         boolean indexExists = indexExistsResponse.value();
 

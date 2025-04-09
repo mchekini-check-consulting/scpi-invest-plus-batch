@@ -26,13 +26,11 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.support.CompositeItemProcessor;
-import org.springframework.batch.item.support.CompositeItemWriter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -53,7 +51,6 @@ public class BatchConfig {
     private final MongoItemWriter mongoItemWriter;
     private final ElasticItemWriter elasticItemWriter;
     private final BatchService batchService;
-
 
     public BatchConfig(
             EntityManagerFactory entityManagerFactory,
@@ -104,35 +101,33 @@ public class BatchConfig {
     }
 
     @Bean
-public ItemWriter<Scpi> compositeWriter() {
-    return items -> {
-        List<Scpi> persistedScpis = items.getItems().stream()
-                .map(item -> (Scpi) item)
-                .toList();
+    public ItemWriter<Scpi> compositeWriter() {
+        return items -> {
+            List<Scpi> persistedScpis = items.getItems().stream()
+                    .map(item -> (Scpi) item)
+                    .toList();
 
-        Chunk<Scpi> chunk = new Chunk<>(persistedScpis);
+            Chunk<Scpi> chunk = new Chunk<>(persistedScpis);
 
-        CompletableFuture<Void> mongoFuture = CompletableFuture.runAsync(() -> {
-            try {
-                mongoItemWriter.write(chunk);
-            } catch (Exception e) {
-                throw new RuntimeException("Erreur lors de l'écriture Mongo", e);
-            }
-        });
+            CompletableFuture<Void> mongoFuture = CompletableFuture.runAsync(() -> {
+                try {
+                    mongoItemWriter.write(chunk);
+                } catch (Exception e) {
+                    throw new RuntimeException("Erreur lors de l'écriture Mongo", e);
+                }
+            });
 
-        CompletableFuture<Void> elasticFuture = CompletableFuture.runAsync(() -> {
-            try {
-                elasticItemWriter.write(chunk);
-            } catch (Exception e) {
-                throw new RuntimeException("Erreur lors de l'écriture Elastic", e);
-            }
-        });
-        CompletableFuture.allOf(mongoFuture, elasticFuture).join();
-    };
-}
+            CompletableFuture<Void> elasticFuture = CompletableFuture.runAsync(() -> {
+                try {
+                    elasticItemWriter.write(chunk);
+                } catch (Exception e) {
+                    throw new RuntimeException("Erreur lors de l'écriture Elastic", e);
+                }
+            });
+            CompletableFuture.allOf(mongoFuture, elasticFuture).join();
+        };
+    }
 
-
-   
     @Bean
     public JpaPagingItemReader<Scpi> scpiPostgresReader() {
         JpaPagingItemReader<Scpi> reader = new JpaPagingItemReader<>();

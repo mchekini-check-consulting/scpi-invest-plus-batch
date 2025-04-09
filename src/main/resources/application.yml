@@ -25,5 +25,4 @@ spring:
     connection-timeout: 1000
     read-timeout: 3000
 
-server:
-  port: 9999
+

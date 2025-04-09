@@ -15,4 +15,5 @@ public class CountryDominant {
     @Field(type = FieldType.Text)
     private String country;
     private BigDecimal countryPercentage;
+
 }
