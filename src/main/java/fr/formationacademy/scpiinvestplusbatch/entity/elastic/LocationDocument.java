@@ -15,8 +15,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class LocationDocument {
 
-    @Field(type = FieldType.Integer)
-    private Integer id;
+    private String country;
 
     @Field(type = FieldType.Float)
     private BigDecimal countryPercentage;

@@ -31,6 +31,7 @@ public interface SectorMapper {
 
         return scpi.getSectors().stream()
                 .map(sector -> SectorDocument.builder()
+                        .name(sector.getId().getName())
                         .sectorPercentage(sector.getSectorPercentage())
                         .build())
                 .toList();

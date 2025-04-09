@@ -33,6 +33,7 @@ public class ScpiItemProcessor implements ItemProcessor<BatchDataDto, Scpi> {
     public final Map<String, Scpi> existingScpis = new HashMap<>();
     private final Set<String> scpisInCsv = new HashSet<>();
 
+
     @PostConstruct
     public void init() {
         log.info("Chargement des SCPIs existantes...");

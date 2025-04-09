@@ -92,8 +92,6 @@ public class BatchService {
 
         scpiMongoRepository.save(document);
 
-        long scpiCount = scpiMongoRepository.count();
-        log.info("Nombre total de SCPI chargées dans MongoDB : {}", scpiCount);
     }
 
     @Transactional
@@ -135,8 +133,6 @@ public class BatchService {
 
         elasticsearchRepository.save(document);
 
-        long total = elasticsearchRepository.count();
-        log.info("Nombre total de SCPI chargées dans Elasticsearch : {}", total);
     }
 
     private Map<String, Scpi> getExistingScpis(List<BatchDataDto> batchDataList) {

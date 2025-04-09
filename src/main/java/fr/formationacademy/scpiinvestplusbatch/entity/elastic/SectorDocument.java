@@ -15,8 +15,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class SectorDocument {
 
-    @Field(type = FieldType.Integer)
-    private Integer id;
+    private String name;
 
     @Field(type = FieldType.Scaled_Float, scalingFactor = 100)
     private BigDecimal sectorPercentage;

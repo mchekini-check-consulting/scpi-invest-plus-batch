@@ -57,7 +57,7 @@ public class SectorService{
                 ? scpi.getSectors().stream()
                 .filter(sec -> sec.getId() != null && sec.getId().getName() != null)
                 .max(Comparator.comparing(Sector::getSectorPercentage))
-                .map(sec -> new SectorDominant(sec.getId().getName(), sec.getSectorPercentage().floatValue()))
+                .map(sec -> new SectorDominant(sec.getId().getName(), sec.getSectorPercentage()))
                 .orElse(null)
                 : null;
     }
