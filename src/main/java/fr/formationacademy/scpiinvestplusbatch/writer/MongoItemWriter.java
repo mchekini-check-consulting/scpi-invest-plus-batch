@@ -1,6 +1,6 @@
 package fr.formationacademy.scpiinvestplusbatch.writer;
 
-import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.Scpi;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Scpi;
 import fr.formationacademy.scpiinvestplusbatch.repository.mongo.ScpiMongoRepository;
 import fr.formationacademy.scpiinvestplusbatch.service.BatchService;
 import lombok.NonNull;
@@ -17,7 +17,6 @@ public class MongoItemWriter implements ItemWriter<Scpi> {
 
     private final ScpiMongoRepository mongoRepository;
     private final BatchService batchService;
-
 
     public MongoItemWriter(ScpiMongoRepository mongoRepository, BatchService batchService) {
         this.mongoRepository = mongoRepository;

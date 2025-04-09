@@ -1,7 +1,7 @@
 package fr.formationacademy.scpiinvestplusbatch.repository.postgres;
 
-import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.Location;
-import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.LocationId;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Location;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.LocationId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

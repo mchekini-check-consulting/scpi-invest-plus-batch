@@ -1,6 +1,6 @@
 package fr.formationacademy.scpiinvestplusbatch.writer;
 
-import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.Scpi;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Scpi;
 import fr.formationacademy.scpiinvestplusbatch.repository.elastic.ScpiElasticRepository;
 import fr.formationacademy.scpiinvestplusbatch.service.BatchService;
 import lombok.NonNull;

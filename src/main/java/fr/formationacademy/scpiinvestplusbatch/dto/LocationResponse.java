@@ -1,7 +1,7 @@
 package fr.formationacademy.scpiinvestplusbatch.dto;
 
 
-import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.LocationId;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.LocationId;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

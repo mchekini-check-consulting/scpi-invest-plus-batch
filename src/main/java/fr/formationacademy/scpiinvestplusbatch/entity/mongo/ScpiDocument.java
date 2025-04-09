@@ -15,8 +15,10 @@ public class ScpiDocument {
 
     @Id
     private String id;
+    private Integer scpiId;
     private String name;
     private String iban;
     private String bic;
     private BigDecimal sharePrice;
+
 }

@@ -1,9 +1,9 @@
 package fr.formationacademy.scpiinvestplusbatch.dto;
 
-import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.Location;
-import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.Scpi;
-import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.Sector;
-import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.StatYear;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Location;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Scpi;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Sector;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.StatYear;
 import lombok.*;
 
 import java.util.List;

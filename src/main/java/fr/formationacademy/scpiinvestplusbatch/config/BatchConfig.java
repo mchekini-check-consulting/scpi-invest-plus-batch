@@ -2,7 +2,7 @@ package fr.formationacademy.scpiinvestplusbatch.config;
 
 import fr.formationacademy.scpiinvestplusbatch.dto.BatchDataDto;
 import fr.formationacademy.scpiinvestplusbatch.dto.ScpiDto;
-import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.Scpi;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Scpi;
 import fr.formationacademy.scpiinvestplusbatch.listener.BatchJobListener;
 import fr.formationacademy.scpiinvestplusbatch.processor.EncodingCorrectionProcessor;
 import fr.formationacademy.scpiinvestplusbatch.processor.ScpiItemProcessor;
@@ -13,12 +13,14 @@ import fr.formationacademy.scpiinvestplusbatch.writer.ElasticItemWriter;
 import fr.formationacademy.scpiinvestplusbatch.writer.MongoItemWriter;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.*;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JpaItemWriter;
@@ -32,6 +34,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Configuration
 @EnableBatchProcessing
@@ -41,14 +44,16 @@ public class BatchConfig {
 
     private final EntityManagerFactory entityManagerFactory;
     private final ScpiItemReader scpiItemReader;
-    private final BatchService batchService;
     private final ScpiItemProcessor scpiItemProcessor;
     private final BatchJobListener batchJobListener;
     private final PlatformTransactionManager transactionManager;
     private final DeleteMissingScpiTasklet deleteMissingScpiTasklet;
     private final JobRepository jobRepository;
+
     private final MongoItemWriter mongoItemWriter;
     private final ElasticItemWriter elasticItemWriter;
+    private final BatchService batchService;
+
 
     public BatchConfig(
             EntityManagerFactory entityManagerFactory,
@@ -80,7 +85,6 @@ public class BatchConfig {
             BatchDataDto batchData = batchService.convertToBatchData(scpiRequest);
             return scpiItemProcessor.process(batchData);
         };
-
         compositeProcessor.setDelegates(List.of(new EncodingCorrectionProcessor<>(), conversionProcessor));
         return compositeProcessor;
     }
@@ -100,16 +104,35 @@ public class BatchConfig {
     }
 
     @Bean
-    public ItemWriter<Scpi> compositeWriter() {
-        CompositeItemWriter<Scpi> compositeItemWriter = new CompositeItemWriter<>();
-        List<ItemWriter<? super Scpi>> writers = new ArrayList<>();
-        writers.add(mongoItemWriter);
-        writers.add(elasticItemWriter);
+public ItemWriter<Scpi> compositeWriter() {
+    return items -> {
+        List<Scpi> persistedScpis = items.getItems().stream()
+                .map(item -> (Scpi) item)
+                .toList();
 
-        compositeItemWriter.setDelegates(writers);
-        return compositeItemWriter;
-    }
+        Chunk<Scpi> chunk = new Chunk<>(persistedScpis);
 
+        CompletableFuture<Void> mongoFuture = CompletableFuture.runAsync(() -> {
+            try {
+                mongoItemWriter.write(chunk);
+            } catch (Exception e) {
+                throw new RuntimeException("Erreur lors de l'écriture Mongo", e);
+            }
+        });
+
+        CompletableFuture<Void> elasticFuture = CompletableFuture.runAsync(() -> {
+            try {
+                elasticItemWriter.write(chunk);
+            } catch (Exception e) {
+                throw new RuntimeException("Erreur lors de l'écriture Elastic", e);
+            }
+        });
+        CompletableFuture.allOf(mongoFuture, elasticFuture).join();
+    };
+}
+
+
+   
     @Bean
     public JpaPagingItemReader<Scpi> scpiPostgresReader() {
         JpaPagingItemReader<Scpi> reader = new JpaPagingItemReader<>();
@@ -124,7 +147,6 @@ public class BatchConfig {
         return new StepBuilder("deleteStep", jobRepository)
                 .tasklet(deleteMissingScpiTasklet, transactionManager)
                 .build();
-
     }
 
     @Bean

@@ -1,7 +1,9 @@
 package fr.formationacademy.scpiinvestplusbatch.mapper;
 
 import fr.formationacademy.scpiinvestplusbatch.dto.SectorRequest;
-import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.Sector;
+import fr.formationacademy.scpiinvestplusbatch.entity.elastic.SectorDocument;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Scpi;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Sector;
 import org.mapstruct.Mapper;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +23,16 @@ public interface SectorMapper {
     default List<SectorRequest> toRequestSectorList(List<Sector> sectors) {
         return sectors.stream()
                 .map(this::toRequest)
+                .toList();
+    }
+
+    default List<SectorDocument> mapSectors(Scpi scpi) {
+        if (scpi.getSectors() == null) return null;
+
+        return scpi.getSectors().stream()
+                .map(sector -> SectorDocument.builder()
+                        .sectorPercentage(sector.getSectorPercentage())
+                        .build())
                 .toList();
     }
 

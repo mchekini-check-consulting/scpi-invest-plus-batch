@@ -1,4 +1,4 @@
-package fr.formationacademy.scpiinvestplusbatch.entity.postgrs;
+package fr.formationacademy.scpiinvestplusbatch.entity.postgres;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

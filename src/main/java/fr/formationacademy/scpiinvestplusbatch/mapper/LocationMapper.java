@@ -1,7 +1,9 @@
 package fr.formationacademy.scpiinvestplusbatch.mapper;
 
 import fr.formationacademy.scpiinvestplusbatch.dto.LocationRequest;
-import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.Location;
+import fr.formationacademy.scpiinvestplusbatch.entity.elastic.LocationDocument;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Location;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Scpi;
 import org.mapstruct.Mapper;
 import org.springframework.stereotype.Component;
 
@@ -23,4 +25,18 @@ public interface LocationMapper {
                 .map(this::toRequest)
                 .toList();
     }
+
+    default List<LocationDocument> mapLocations(Scpi scpi) {
+        if (scpi.getLocations() == null) return null;
+
+        return scpi.getLocations().stream()
+                .map(location -> LocationDocument.builder()
+                        .id(location.getScpi().getId())
+                        .countryPercentage(location.getCountryPercentage())
+                        .build())
+                .toList();
+    }
+
+
+
 }

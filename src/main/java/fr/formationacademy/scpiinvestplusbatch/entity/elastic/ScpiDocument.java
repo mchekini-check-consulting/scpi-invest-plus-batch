@@ -16,18 +16,41 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(indexName = "scpis")
-public class ScpiElasticsearchDocument {
+@Document(indexName = "scpi")
+public class ScpiDocument {
 
     @Id
     private String id;
+
+    private Integer scpiId;
+
+    @Field(type = FieldType.Text, analyzer = "edge_ngram_analyzer", searchAnalyzer = "standard")
     private String name;
-    private Integer minimumSubscription;
-    private BigDecimal subscriptionFees;
+
+    private BigDecimal distributionRate;
+
+    private Boolean subscriptionFees;
+
+    @Field(type = FieldType.Scaled_Float, scalingFactor = 100)
+    private BigDecimal subscriptionFeesBigDecimal;
+
+    @Field(type = FieldType.Scaled_Float, scalingFactor = 100)
     private BigDecimal managementCosts;
-    private String iban;
-    private String bic;
+
+    private Long capitalization;
+
+    private Integer enjoymentDelay;
+
+    @Field(type = FieldType.Text)
     private String frequencyPayment;
+
+    private Integer minimumSubscription;
+
+    @Field(type = FieldType.Object)
+    private CountryDominant countryDominant;
+
+    @Field(type = FieldType.Object)
+    private SectorDominant sectorDominant;
 
     @Field(type = FieldType.Nested, includeInParent = true)
     private List<LocationDocument> locations;
@@ -37,4 +60,5 @@ public class ScpiElasticsearchDocument {
 
     @Field(type = FieldType.Nested, includeInParent = true)
     private List<StatYearDocument> statYears;
+
 }

@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
-    password: postgres
+    password: admin
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 5
@@ -24,3 +24,6 @@ spring:
       uris: http://localhost:9200
     connection-timeout: 1000
     read-timeout: 3000
+
+server:
+  port: 9999

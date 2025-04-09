@@ -3,10 +3,10 @@ package fr.formationacademy.scpiinvestplusbatch.processor;
 
 import fr.formationacademy.scpiinvestplusbatch.dto.BatchDataDto;
 import fr.formationacademy.scpiinvestplusbatch.dto.ScpiDto;
-import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.Location;
-import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.Scpi;
-import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.Sector;
-import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.StatYear;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Location;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Scpi;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Sector;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.StatYear;
 import fr.formationacademy.scpiinvestplusbatch.repository.postgres.ScpiRepository;
 import fr.formationacademy.scpiinvestplusbatch.service.LocationService;
 import fr.formationacademy.scpiinvestplusbatch.service.SectorService;

@@ -1,9 +1,10 @@
 package fr.formationacademy.scpiinvestplusbatch.service;
 
 import fr.formationacademy.scpiinvestplusbatch.dto.LocationRequest;
-import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.Location;
-import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.LocationId;
-import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.Scpi;
+import fr.formationacademy.scpiinvestplusbatch.entity.elastic.CountryDominant;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Location;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.LocationId;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Scpi;
 import fr.formationacademy.scpiinvestplusbatch.mapper.LocationMapper;
 import fr.formationacademy.scpiinvestplusbatch.repository.postgres.LocationRepository;
 import io.micrometer.common.util.StringUtils;
@@ -13,10 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -52,6 +50,16 @@ public class LocationService {
             return existingLocations;
         }
         return newLocations;
+    }
+
+    public CountryDominant getCountryDominant(Scpi scpi) {
+        return scpi.getLocations() != null && !scpi.getLocations().isEmpty()
+                ? scpi.getLocations().stream()
+                .filter(loc -> loc.getId() != null && loc.getId().getCountry() != null)
+                .max(Comparator.comparing(Location::getCountryPercentage))
+                .map(loc -> new CountryDominant(loc.getId().getCountry(), loc.getCountryPercentage()))
+                .orElse(null)
+                : null;
     }
 
     private List<Location> parseLocations(String localisationData, Scpi scpi) {

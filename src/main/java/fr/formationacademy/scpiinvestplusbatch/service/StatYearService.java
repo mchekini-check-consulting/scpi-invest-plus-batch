@@ -1,9 +1,9 @@
 package fr.formationacademy.scpiinvestplusbatch.service;
 
 import fr.formationacademy.scpiinvestplusbatch.dto.ScpiDto;
-import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.Scpi;
-import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.StatYear;
-import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.StatYearId;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Scpi;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.StatYear;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.StatYearId;
 import fr.formationacademy.scpiinvestplusbatch.repository.postgres.StatYearRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

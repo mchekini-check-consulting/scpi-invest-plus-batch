@@ -1,9 +1,10 @@
 package fr.formationacademy.scpiinvestplusbatch.service;
 
 import fr.formationacademy.scpiinvestplusbatch.dto.SectorRequest;
-import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.Scpi;
-import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.Sector;
-import fr.formationacademy.scpiinvestplusbatch.entity.postgrs.SectorId;
+import fr.formationacademy.scpiinvestplusbatch.entity.elastic.SectorDominant;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Scpi;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Sector;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.SectorId;
 import fr.formationacademy.scpiinvestplusbatch.mapper.SectorMapper;
 import fr.formationacademy.scpiinvestplusbatch.repository.postgres.SectorRepository;
 import io.micrometer.common.util.StringUtils;
@@ -12,10 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -52,6 +50,16 @@ public class SectorService{
         }
 
         return newSectors;
+    }
+
+    public SectorDominant getSectorDominant(Scpi scpi) {
+        return scpi.getSectors() != null && !scpi.getSectors().isEmpty()
+                ? scpi.getSectors().stream()
+                .filter(sec -> sec.getId() != null && sec.getId().getName() != null)
+                .max(Comparator.comparing(Sector::getSectorPercentage))
+                .map(sec -> new SectorDominant(sec.getId().getName(), sec.getSectorPercentage().floatValue()))
+                .orElse(null)
+                : null;
     }
 
     private List<Sector> parseSectors(String sectorData, Scpi scpi) {
