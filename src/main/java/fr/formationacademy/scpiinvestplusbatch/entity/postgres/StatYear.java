@@ -1,20 +1,21 @@
-package fr.formationacademy.scpiinvestplusbatch.entity;
+package fr.formationacademy.scpiinvestplusbatch.entity.postgres;
 
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Entity
-public class Sector {
+@Builder
+public class StatYear {
     @EmbeddedId
-    private SectorId id;
-    private BigDecimal sectorPercentage;
+    private StatYearId yearStat;
+    private BigDecimal distributionRate;
+    private BigDecimal sharePrice;
+    private BigDecimal reconstitutionValue;
 
     @ManyToOne
     @MapsId("scpiId")

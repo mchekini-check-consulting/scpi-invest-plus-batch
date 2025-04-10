@@ -1,4 +1,4 @@
-package fr.formationacademy.scpiinvestplusbatch.entity;
+package fr.formationacademy.scpiinvestplusbatch.entity.postgres;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -7,18 +7,22 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Embeddable
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
-public class SectorId implements java.io.Serializable {
+public class StatYearId implements Serializable {
+    @Column(name = "year_stat")
+    private Integer yearStat;
 
     @Column(name = "scpi_id")
     private Integer scpiId;
 
-    @Column(name = "name")
-    private String name;
-
+    public StatYearId(Integer yearStat) {
+        this.yearStat = yearStat;
+    }
 
 }

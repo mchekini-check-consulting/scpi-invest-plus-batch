@@ -1,6 +1,6 @@
 package fr.formationacademy.scpiinvestplusbatch.dto;
 
-import fr.formationacademy.scpiinvestplusbatch.entity.StatYear;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.StatYear;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -55,7 +55,7 @@ public class ScpiDto {
     private Float cashback;
 
     private String advertising;
-   // J'ai besoin de les traiter comme une chaine ici
+    // J'ai besoin de les traiter comme une chaine ici
     private String distributedRate;
     private String sharePrice;
     private String reconstitutionValue;

@@ -1,33 +1,36 @@
 package fr.formationacademy.scpiinvestplusbatch.service;
 
 import fr.formationacademy.scpiinvestplusbatch.dto.LocationRequest;
-import fr.formationacademy.scpiinvestplusbatch.entity.Location;
-import fr.formationacademy.scpiinvestplusbatch.entity.LocationId;
-import fr.formationacademy.scpiinvestplusbatch.entity.Scpi;
-import fr.formationacademy.scpiinvestplusbatch.mapper.EntityMapper;
-import fr.formationacademy.scpiinvestplusbatch.repository.LocationRepository;
+import fr.formationacademy.scpiinvestplusbatch.entity.elastic.CountryDominant;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Location;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.LocationId;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Scpi;
+import fr.formationacademy.scpiinvestplusbatch.mapper.LocationMapper;
+import fr.formationacademy.scpiinvestplusbatch.repository.postgres.LocationRepository;
 import io.micrometer.common.util.StringUtils;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class LocationService {
 
     private final LocationRepository locationRepository;
-    private final EntityMapper locationMapper;
+    private final LocationMapper locationMapper;
 
+    public LocationService(LocationRepository locationRepository, LocationMapper locationMapper) {
+        this.locationRepository = locationRepository;
+        this.locationMapper = locationMapper;
+    }
+
+    @Transactional
     public List<Location> createLocations(String localisationData, Scpi scpi) {
         if (StringUtils.isBlank(localisationData)) {
             log.debug("Aucune localisation fournie pour la SCPI: {}", scpi.getName());
@@ -47,6 +50,16 @@ public class LocationService {
             return existingLocations;
         }
         return newLocations;
+    }
+
+    public CountryDominant getCountryDominant(Scpi scpi) {
+        return scpi.getLocations() != null && !scpi.getLocations().isEmpty()
+                ? scpi.getLocations().stream()
+                .filter(loc -> loc.getId() != null && loc.getId().getCountry() != null)
+                .max(Comparator.comparing(Location::getCountryPercentage))
+                .map(loc -> new CountryDominant(loc.getId().getCountry(), loc.getCountryPercentage()))
+                .orElse(null)
+                : null;
     }
 
     private List<Location> parseLocations(String localisationData, Scpi scpi) {

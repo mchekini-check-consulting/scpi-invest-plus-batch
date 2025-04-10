@@ -1,32 +1,35 @@
 package fr.formationacademy.scpiinvestplusbatch.service;
 
 import fr.formationacademy.scpiinvestplusbatch.dto.SectorRequest;
-import fr.formationacademy.scpiinvestplusbatch.entity.Scpi;
-import fr.formationacademy.scpiinvestplusbatch.entity.Sector;
-import fr.formationacademy.scpiinvestplusbatch.entity.SectorId;
-import fr.formationacademy.scpiinvestplusbatch.mapper.EntityMapper;
-import fr.formationacademy.scpiinvestplusbatch.repository.SectorRepository;
+import fr.formationacademy.scpiinvestplusbatch.entity.elastic.SectorDominant;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Scpi;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Sector;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.SectorId;
+import fr.formationacademy.scpiinvestplusbatch.mapper.SectorMapper;
+import fr.formationacademy.scpiinvestplusbatch.repository.postgres.SectorRepository;
 import io.micrometer.common.util.StringUtils;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class SectorService{
 
     private final SectorRepository sectorRepository;
-    private final EntityMapper sectorMapper;
+    private final SectorMapper sectorMapper;
 
+    public SectorService(SectorRepository sectorRepository, SectorMapper sectorMapper) {
+        this.sectorRepository = sectorRepository;
+        this.sectorMapper = sectorMapper;
+    }
+
+    @Transactional
     public List<Sector> createSectors(String sectorData, Scpi scpi) {
         if (StringUtils.isBlank(sectorData)) {
             log.debug("Aucun secteur fourni pour la SCPI: {}", scpi.getName());
@@ -47,6 +50,16 @@ public class SectorService{
         }
 
         return newSectors;
+    }
+
+    public SectorDominant getSectorDominant(Scpi scpi) {
+        return scpi.getSectors() != null && !scpi.getSectors().isEmpty()
+                ? scpi.getSectors().stream()
+                .filter(sec -> sec.getId() != null && sec.getId().getName() != null)
+                .max(Comparator.comparing(Sector::getSectorPercentage))
+                .map(sec -> new SectorDominant(sec.getId().getName(), sec.getSectorPercentage()))
+                .orElse(null)
+                : null;
     }
 
     private List<Sector> parseSectors(String sectorData, Scpi scpi) {

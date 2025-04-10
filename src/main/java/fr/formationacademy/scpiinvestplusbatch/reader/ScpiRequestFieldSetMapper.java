@@ -2,13 +2,11 @@ package fr.formationacademy.scpiinvestplusbatch.reader;
 
 import fr.formationacademy.scpiinvestplusbatch.dto.ScpiDto;
 import fr.formationacademy.scpiinvestplusbatch.enums.ScpiField;
-import lombok.RequiredArgsConstructor;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class ScpiRequestFieldSetMapper implements FieldSetMapper<ScpiDto> {
     @Override
     public ScpiDto mapFieldSet(FieldSet fieldSet) {

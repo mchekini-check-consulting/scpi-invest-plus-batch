@@ -1,0 +1,13 @@
+server:
+  port: 8088
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+
+  elasticsearch:
+    rest:
+      uris: http://localhost:9200
+
+  data:
+    mongodb:
+      uri: mongodb://admin:admin@localhost:27017/scpi-invest-partner-db?authSource=admin
