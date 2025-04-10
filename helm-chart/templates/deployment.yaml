@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scpi-invest-plus-batch
+  labels:
+    app: scpi-invest-plus-batch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: scpi-invest-plus-batch
+  template:
+    metadata:
+      name: scpi-invest-plus-batch
+      labels:
+        app: scpi-invest-plus-batch
+    spec:
+      containers:
+        - name: scpi-invest-plus-batch
+          image: "{{.Values.image.repo}}/{{.Values.image.name}}:{{.Values.image.tag}}"
+          imagePullPolicy: Always
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "{{.Values.application.environment }}"
