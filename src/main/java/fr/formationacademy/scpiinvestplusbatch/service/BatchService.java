@@ -2,7 +2,9 @@ package fr.formationacademy.scpiinvestplusbatch.service;
 
 import fr.formationacademy.scpiinvestplusbatch.dto.BatchDataDto;
 import fr.formationacademy.scpiinvestplusbatch.dto.ScpiDto;
-import fr.formationacademy.scpiinvestplusbatch.entity.elastic.*;
+import fr.formationacademy.scpiinvestplusbatch.entity.elastic.CountryDominant;
+import fr.formationacademy.scpiinvestplusbatch.entity.elastic.ScpiDocument;
+import fr.formationacademy.scpiinvestplusbatch.entity.elastic.SectorDominant;
 import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Scpi;
 import fr.formationacademy.scpiinvestplusbatch.entity.postgres.StatYear;
 import fr.formationacademy.scpiinvestplusbatch.mapper.LocationMapper;
@@ -10,10 +12,11 @@ import fr.formationacademy.scpiinvestplusbatch.mapper.SectorMapper;
 import fr.formationacademy.scpiinvestplusbatch.repository.elastic.ScpiElasticRepository;
 import fr.formationacademy.scpiinvestplusbatch.repository.mongo.ScpiMongoRepository;
 import fr.formationacademy.scpiinvestplusbatch.repository.postgres.ScpiRepository;
-import org.springframework.transaction.annotation.Transactional;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -33,7 +36,15 @@ public class BatchService {
     private final SectorMapper sectorMapper;
     private final ScpiIndexService scpiIndexService;
 
-    public BatchService(ScpiRepository scpiRepository, ScpiElasticRepository elasticsearchRepository, LocationService locationService, ScpiMongoRepository scpiMongoRepository, LocationMapper locationMapper, SectorService sectorService, SectorMapper sectorMapper, ScpiIndexService scpiIndexService) {
+    public BatchService(
+            ScpiRepository scpiRepository,
+            ScpiElasticRepository elasticsearchRepository,
+            LocationService locationService,
+            ScpiMongoRepository scpiMongoRepository,
+            LocationMapper locationMapper,
+            SectorService sectorService,
+            SectorMapper sectorMapper,
+            ScpiIndexService scpiIndexService) {
         this.scpiRepository = scpiRepository;
         this.elasticsearchRepository = elasticsearchRepository;
         this.locationService = locationService;
@@ -54,28 +65,34 @@ public class BatchService {
         Map<String, Scpi> existingScpis = getExistingScpis(batchDataList);
         List<Scpi> scpisToInsert = new ArrayList<>();
         List<Scpi> scpisToUpdate = new ArrayList<>();
+
         for (BatchDataDto batchData : batchDataList) {
             Scpi scpi = batchData.getScpi();
-            Scpi existingScpi = existingScpis.get(scpi.getName());
-            if (existingScpi != null) {
-                if (!isSame(scpi, existingScpi)) {
+            Scpi existing = existingScpis.get(scpi.getName());
+
+            if (existing != null) {
+                if (!isSame(existing, scpi)) {
+                    scpi.setId(existing.getId()); // Update existing record
                     scpisToUpdate.add(scpi);
                 }
             } else {
                 scpisToInsert.add(scpi);
             }
         }
+
         saveEntities(scpiRepository, scpisToInsert, "New SCPIs");
         saveEntities(scpiRepository, scpisToUpdate, "Updated SCPIs");
     }
 
     @Transactional
     public void saveToMongo(Scpi scpi) {
+        Optional<fr.formationacademy.scpiinvestplusbatch.entity.mongo.ScpiDocument> optionalExisting =
+                scpiMongoRepository.findByName(scpi.getName());
 
-        Optional<fr.formationacademy.scpiinvestplusbatch.entity.mongo.ScpiDocument> existing = scpiMongoRepository.findByName(scpi.getName());
-        BigDecimal sharePrice = scpi.getStatYears().isEmpty() ? null : scpi.getStatYears().get(0).getSharePrice();
+        BigDecimal sharePrice = scpi.getStatYears().isEmpty() ? null :
+                scpi.getStatYears().get(0).getSharePrice();
 
-        fr.formationacademy.scpiinvestplusbatch.entity.mongo.ScpiDocument document = fr.formationacademy.scpiinvestplusbatch.entity.mongo.ScpiDocument.builder()
+        var document = fr.formationacademy.scpiinvestplusbatch.entity.mongo.ScpiDocument.builder()
                 .scpiId(scpi.getId())
                 .name(scpi.getName())
                 .iban(scpi.getIban())
@@ -83,35 +100,31 @@ public class BatchService {
                 .sharePrice(sharePrice)
                 .build();
 
-        if (existing.isPresent()) {
-            fr.formationacademy.scpiinvestplusbatch.entity.mongo.ScpiDocument existingDoc = existing.get();
-            if (isSame(document, existingDoc)) {
-                return;
-            } else {
-                document.setId(existingDoc.getId());
+        optionalExisting.ifPresent(existing -> {
+            if (!isSame(existing, document)) {
+                document.setId(existing.getId());
                 log.info("SCPI '{}' déjà présente mais différente, mise à jour dans MongoDB...", scpi.getName());
+                scpiMongoRepository.save(document);
             }
-        } else {
+        });
+
+        if (optionalExisting.isEmpty()) {
             log.info("SCPI '{}' absente de MongoDB, insertion en cours...", scpi.getName());
+            scpiMongoRepository.save(document);
         }
 
-        scpiMongoRepository.save(document);
-        long scpiCount = scpiMongoRepository.count();
-        log.info("Nombre total de SCPI chargées dans MongoDB : {}", scpiCount);
+        long count = scpiMongoRepository.count();
+        log.info("Nombre total de SCPI chargées dans MongoDB : {}", count);
     }
 
     @Transactional
     public void saveToElastic(Scpi scpi) throws IOException {
         Optional<ScpiDocument> existing = elasticsearchRepository.findByName(scpi.getName());
 
-        BigDecimal distributionRate = null;
-        if (scpi.getStatYears() != null && !scpi.getStatYears().isEmpty()) {
-            StatYear latestStat = Collections.max(
-                    scpi.getStatYears(),
-                    Comparator.comparing(stat -> stat.getYearStat().getYearStat())
-            );
-            distributionRate = latestStat.getDistributionRate();
-        }
+        BigDecimal distributionRate = scpi.getStatYears().stream()
+                .max(Comparator.comparing(stat -> stat.getYearStat().getYearStat()))
+                .map(StatYear::getDistributionRate)
+                .orElse(null);
 
         Integer minimumSubscription = scpi.getMinimumSubscription();
         CountryDominant countryDominant = locationService.getCountryDominant(scpi);
@@ -136,7 +149,6 @@ public class BatchService {
                 .build();
 
         existing.ifPresent(existingDoc -> document.setId(existingDoc.getId()));
-
         elasticsearchRepository.save(document);
 
         long total = elasticsearchRepository.count();
@@ -144,20 +156,21 @@ public class BatchService {
     }
 
     private Map<String, Scpi> getExistingScpis(List<BatchDataDto> batchDataList) {
-        List<String> scpiNames = batchDataList.stream()
+        List<String> names = batchDataList.stream()
                 .map(dto -> dto.getScpi().getName())
                 .filter(Objects::nonNull)
                 .distinct()
                 .toList();
 
-        return scpiRepository.findByNameIn(scpiNames)
-                .stream().collect(Collectors.toMap(Scpi::getName, scpi -> scpi));
+        return scpiRepository.findByNameIn(names)
+                .stream()
+                .collect(Collectors.toMap(Scpi::getName, scpi -> scpi));
     }
 
-    private <T> void saveEntities(JpaRepository<T, ?> repository, List<T> entities, String entityName) {
+    private <T> void saveEntities(JpaRepository<T, ?> repository, List<T> entities, String logLabel) {
         if (!entities.isEmpty()) {
             repository.saveAll(entities);
-            log.info("{} entities saved: {}", entityName, entities.size());
+            log.info("{} entities saved: {}", logLabel, entities.size());
         }
     }
 
@@ -171,29 +184,30 @@ public class BatchService {
                 .build();
     }
 
-    public boolean isSame(Scpi existing, Scpi scpi) {
-        return Objects.equals(existing.getMinimumSubscription(), scpi.getMinimumSubscription())
-                && Objects.equals(existing.getCapitalization(), scpi.getCapitalization())
-                && Objects.equals(existing.getManager(), scpi.getManager())
-                && Objects.equals(existing.getSubscriptionFees(), scpi.getSubscriptionFees())
-                && Objects.equals(existing.getManagementCosts(), scpi.getManagementCosts())
-                && Objects.equals(existing.getEnjoymentDelay(), scpi.getEnjoymentDelay())
-                && Objects.equals(existing.getIban(), scpi.getIban())
-                && Objects.equals(existing.getBic(), scpi.getBic())
-                && Objects.equals(existing.getScheduledPayment(), scpi.getScheduledPayment())
-                && Objects.equals(existing.getFrequencyPayment(), scpi.getFrequencyPayment())
-                && Objects.equals(existing.getCashback(), scpi.getCashback())
-                && Objects.equals(existing.getAdvertising(), scpi.getAdvertising())
-                && Objects.equals(existing.getLocations(), scpi.getLocations())
-                && Objects.equals(existing.getStatYears(), scpi.getStatYears())
-                && Objects.equals(existing.getSectors(), scpi.getSectors());
+    public boolean isSame(Scpi a, Scpi b) {
+        return Objects.equals(a.getMinimumSubscription(), b.getMinimumSubscription())
+                && Objects.equals(a.getCapitalization(), b.getCapitalization())
+                && Objects.equals(a.getManager(), b.getManager())
+                && Objects.equals(a.getSubscriptionFees(), b.getSubscriptionFees())
+                && Objects.equals(a.getManagementCosts(), b.getManagementCosts())
+                && Objects.equals(a.getEnjoymentDelay(), b.getEnjoymentDelay())
+                && Objects.equals(a.getIban(), b.getIban())
+                && Objects.equals(a.getBic(), b.getBic())
+                && Objects.equals(a.getScheduledPayment(), b.getScheduledPayment())
+                && Objects.equals(a.getFrequencyPayment(), b.getFrequencyPayment())
+                && Objects.equals(a.getCashback(), b.getCashback())
+                && Objects.equals(a.getAdvertising(), b.getAdvertising())
+                && Objects.equals(a.getLocations(), b.getLocations())
+                && Objects.equals(a.getStatYears(), b.getStatYears())
+                && Objects.equals(a.getSectors(), b.getSectors());
     }
 
-    private boolean isSame(fr.formationacademy.scpiinvestplusbatch.entity.mongo.ScpiDocument existing, fr.formationacademy.scpiinvestplusbatch.entity.mongo.ScpiDocument scpi) {
-        return Objects.equals(existing.getName(), scpi.getName()) &&
-                Objects.equals(existing.getIban(), scpi.getIban()) &&
-                Objects.equals(existing.getBic(), scpi.getBic()) &&
-                Objects.equals(existing.getSharePrice(), scpi.getSharePrice());
+    private boolean isSame(
+            fr.formationacademy.scpiinvestplusbatch.entity.mongo.ScpiDocument a,
+            fr.formationacademy.scpiinvestplusbatch.entity.mongo.ScpiDocument b) {
+        return Objects.equals(a.getName(), b.getName())
+                && Objects.equals(a.getIban(), b.getIban())
+                && Objects.equals(a.getBic(), b.getBic())
+                && Objects.equals(a.getSharePrice(), b.getSharePrice());
     }
-
 }
