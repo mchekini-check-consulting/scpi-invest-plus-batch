@@ -5,7 +5,6 @@ import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Scpi;
 import fr.formationacademy.scpiinvestplusbatch.entity.postgres.StatYear;
 import fr.formationacademy.scpiinvestplusbatch.entity.postgres.StatYearId;
 import fr.formationacademy.scpiinvestplusbatch.repository.postgres.StatYearRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -19,13 +18,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class StatYearService {
 
     private final StatYearRepository statYearRepository;
+
+    public StatYearService(StatYearRepository statYearRepository) {
+        this.statYearRepository = statYearRepository;
+    }
 
     @Transactional
     public List<StatYear> createStatYears(ScpiDto scpiDto, Scpi scpi) {

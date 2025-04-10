@@ -19,11 +19,23 @@ spring:
     mongodb:
       uri: mongodb://admin:admin@scpi-invest-partner-db:27017/scpi-invest-partner-db?authSource=admin
 
+  # TODO : SHOULD DEPLOY ELASTIC SEARCH
+
   elasticsearch:
     rest:
       uris: http://localhost:9200
     connection-timeout: 1000
     read-timeout: 3000
 
-server:
-  port: 9999
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+  endpoint:
+    prometheus:
+      enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true

@@ -31,7 +31,7 @@ public interface LocationMapper {
 
         return scpi.getLocations().stream()
                 .map(location -> LocationDocument.builder()
-                        .id(location.getScpi().getId())
+                        .country(location.getId().getCountry())
                         .countryPercentage(location.getCountryPercentage())
                         .build())
                 .toList();

@@ -15,12 +15,16 @@ import java.time.format.DateTimeFormatter;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 @EnableScheduling
 public class BatchJobScheduler implements CommandLineRunner {
 
     private final JobLauncher jobLauncher;
     private final Job scpiJob;
+
+    public BatchJobScheduler(JobLauncher jobLauncher, Job scpiJob) {
+        this.jobLauncher = jobLauncher;
+        this.scpiJob = scpiJob;
+    }
 
     @Override
     public void run(String... args) throws Exception {

@@ -55,7 +55,7 @@ public class ScpiDto {
     private Float cashback;
 
     private String advertising;
-   // J'ai besoin de les traiter comme une chaine ici
+    // J'ai besoin de les traiter comme une chaine ici
     private String distributedRate;
     private String sharePrice;
     private String reconstitutionValue;

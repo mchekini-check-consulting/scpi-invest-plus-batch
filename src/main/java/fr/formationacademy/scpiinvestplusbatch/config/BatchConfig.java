@@ -52,7 +52,6 @@ public class BatchConfig {
     private final ElasticItemWriter elasticItemWriter;
     private final BatchService batchService;
 
-
     public BatchConfig(
             EntityManagerFactory entityManagerFactory,
             ScpiItemReader scpiItemReader,
@@ -129,9 +128,9 @@ public class BatchConfig {
         };
     }
 
-
     @Bean
     public JpaPagingItemReader<Scpi> scpiPostgresReader() {
+
         JpaPagingItemReader<Scpi> reader = new JpaPagingItemReader<>();
         reader.setEntityManagerFactory(entityManagerFactory);
         reader.setQueryString("SELECT s FROM Scpi s");
@@ -148,6 +147,7 @@ public class BatchConfig {
 
     @Bean
     public Step importStep() {
+
         return new StepBuilder("importStep", jobRepository)
                 .<ScpiDto, Scpi>chunk(20, transactionManager)
                 .reader(scpiItemReader.reader())
@@ -169,10 +169,12 @@ public class BatchConfig {
                 .skip(Exception.class)
                 .skipLimit(100)
                 .build();
+
     }
 
     @Bean
     public Job importScpiJob() {
+
         return new JobBuilder("importScpiJob", jobRepository)
                 .listener(batchJobListener)
                 .incrementer(new RunIdIncrementer())

@@ -1,7 +1,6 @@
 package fr.formationacademy.scpiinvestplusbatch.service;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch.indices.CreateIndexResponse;
 import co.elastic.clients.transport.endpoints.BooleanResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -53,18 +52,16 @@ public class ScpiIndexService {
                           "keyword": { "type": "keyword" }
                         }
                       },
-                      "distributionRate": {
+                      "distributionRate": { "type": "scaled_float" },
+                
+                       "subscriptionFeesBigDecimal": {
                         "type": "scaled_float",
-                        "scaling_factor": 100
-                      },
-                      "subscriptionFeesBigDecimal": {
-                        "type": "scaled_float",
-                        "scaling_factor": 100
-                      },
+                         "scaling_factor": 100
+                       },
                       "managementCosts": {
-                        "type": "scaled_float",
+                       "type": "scaled_float",
                         "scaling_factor": 100
-                      },
+                        },
                       "capitalization": { "type": "long" },
                       "enjoymentDelay": { "type": "integer" },
                       "frequencyPayment": {
@@ -95,7 +92,9 @@ public class ScpiIndexService {
                               "keyword": { "type": "keyword" }
                             }
                           },
-                          "sectorPercentage": { "type": "float" }
+                          "sectorPercentage": { "type": "scaled_float"
+                                                "scaling_factor": 100
+                          }
                         }
                       },
                       "locations": {
@@ -127,27 +126,19 @@ public class ScpiIndexService {
                 }
                 """;
 
-        try {
-            CreateIndexResponse response = elasticsearchClient.indices().create(c -> c
-                    .index(INDEX_NAME)
-                    .withJson(new ByteArrayInputStream(mappingJson.getBytes(StandardCharsets.UTF_8)))
-            );
-            log.info("Index '{}' created: {}", INDEX_NAME, response.acknowledged());
-        } catch (IOException e) {
-            log.error("Failed to create index '{}' with mapping", INDEX_NAME, e);
-            throw e;
-        }
+        elasticsearchClient.indices().create(c -> c
+                .index(INDEX_NAME)
+                .withJson(new ByteArrayInputStream(mappingJson.getBytes(StandardCharsets.UTF_8)))
+        );
     }
 
-    public void createIndexIfNotExists() throws IOException {
+    void createIndexIfNotExists() throws IOException {
         BooleanResponse indexExistsResponse = elasticsearchClient.indices().exists(b -> b.index(INDEX_NAME));
         boolean indexExists = indexExistsResponse.value();
 
         if (!indexExists) {
-            log.info("Index '{}' does not exist. Creating index with mapping...", INDEX_NAME);
             createIndexWithMapping();
-        } else {
-            log.info("Index '{}' already exists. Skipping creation.", INDEX_NAME);
         }
     }
+
 }

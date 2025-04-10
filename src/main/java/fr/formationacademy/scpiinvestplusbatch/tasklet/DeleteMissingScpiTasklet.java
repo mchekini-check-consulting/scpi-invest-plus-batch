@@ -3,7 +3,6 @@ package fr.formationacademy.scpiinvestplusbatch.tasklet;
 import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Scpi;
 import fr.formationacademy.scpiinvestplusbatch.repository.postgres.ScpiRepository;
 import jakarta.validation.constraints.NotNull;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -20,11 +19,14 @@ import java.util.List;
 import java.util.Set;
 
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class DeleteMissingScpiTasklet implements Tasklet {
 
     private final ScpiRepository scpiRepository;
+
+    public DeleteMissingScpiTasklet(ScpiRepository scpiRepository) {
+        this.scpiRepository = scpiRepository;
+    }
 
     @Override
     public RepeatStatus execute(@NotNull StepContribution contribution, ChunkContext chunkContext) throws Exception {

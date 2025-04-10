@@ -5,7 +5,6 @@ import fr.formationacademy.scpiinvestplusbatch.service.BatchService;
 import fr.formationacademy.scpiinvestplusbatch.service.LocationService;
 import fr.formationacademy.scpiinvestplusbatch.service.SectorService;
 import fr.formationacademy.scpiinvestplusbatch.service.StatYearService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
@@ -15,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class PostgresItemWriter implements ItemWriter<BatchDataDto> {
 
@@ -23,6 +21,13 @@ public class PostgresItemWriter implements ItemWriter<BatchDataDto> {
     private final LocationService locationService;
     private final SectorService sectorService;
     private final StatYearService statYearService;
+
+    public PostgresItemWriter(BatchService batchService, LocationService locationService, SectorService sectorService, StatYearService statYearService) {
+        this.batchService = batchService;
+        this.locationService = locationService;
+        this.sectorService = sectorService;
+        this.statYearService = statYearService;
+    }
 
     @Transactional
     @Override
