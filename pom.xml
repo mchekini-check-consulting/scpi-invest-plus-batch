@@ -13,9 +13,9 @@
     </parent>
 
     <groupId>fr.formationacademy</groupId>
-    <artifactId>scpiinvestbatch</artifactId>
+    <artifactId>scpi-invest-plus-batch</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>scpiinvestbatch</name>
+    <name>scpi-invest-plus-batch</name>
     <description>Application de traitement batch pour SCPIs</description>
 
     <properties>
