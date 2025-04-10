@@ -1,8 +1,11 @@
 package fr.formationacademy.scpiinvestplusbatch.service;
 
+
 import fr.formationacademy.scpiinvestplusbatch.dto.BatchDataDto;
 import fr.formationacademy.scpiinvestplusbatch.dto.ScpiDto;
-import fr.formationacademy.scpiinvestplusbatch.entity.elastic.*;
+import fr.formationacademy.scpiinvestplusbatch.entity.elastic.CountryDominant;
+import fr.formationacademy.scpiinvestplusbatch.entity.elastic.ScpiDocument;
+import fr.formationacademy.scpiinvestplusbatch.entity.elastic.SectorDominant;
 import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Scpi;
 import fr.formationacademy.scpiinvestplusbatch.entity.postgres.StatYear;
 import fr.formationacademy.scpiinvestplusbatch.mapper.LocationMapper;
@@ -181,11 +184,5 @@ public class BatchService {
                 && Objects.equals(existing.getSectors(), scpi.getSectors());
     }
 
-    private boolean isSame(fr.formationacademy.scpiinvestplusbatch.entity.mongo.ScpiDocument existing, fr.formationacademy.scpiinvestplusbatch.entity.mongo.ScpiDocument scpi) {
-        return Objects.equals(existing.getName(), scpi.getName()) &&
-                Objects.equals(existing.getIban(), scpi.getIban()) &&
-                Objects.equals(existing.getBic(), scpi.getBic()) &&
-                Objects.equals(existing.getSharePrice(), scpi.getSharePrice());
-    }
 
 }

@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
+    url: jdbc:postgresql://scpi-invest-db:5432/postgres
     username: postgres
-    password: admin
+    password: postgres
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 5
@@ -17,7 +17,9 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb://admin:admin@localhost:27017/mongo_db_app?authSource=admin
+      uri: mongodb://admin:admin@localhost:27017/scpi-invest-partner-db?authSource=admin
+
+  # TODO : SHOULD DEPLOY ELASTIC SEARCH
 
   elasticsearch:
     rest:
@@ -25,4 +27,15 @@ spring:
     connection-timeout: 1000
     read-timeout: 3000
 
-
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+  endpoint:
+    prometheus:
+      enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true

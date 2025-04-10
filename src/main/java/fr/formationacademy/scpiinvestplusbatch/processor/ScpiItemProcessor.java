@@ -1,6 +1,5 @@
 package fr.formationacademy.scpiinvestplusbatch.processor;
 
-
 import fr.formationacademy.scpiinvestplusbatch.dto.BatchDataDto;
 import fr.formationacademy.scpiinvestplusbatch.dto.ScpiDto;
 import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Location;
@@ -13,7 +12,6 @@ import fr.formationacademy.scpiinvestplusbatch.service.SectorService;
 import fr.formationacademy.scpiinvestplusbatch.service.StatYearService;
 import io.micrometer.common.lang.NonNull;
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
@@ -21,7 +19,6 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class ScpiItemProcessor implements ItemProcessor<BatchDataDto, Scpi> {
 
@@ -33,6 +30,12 @@ public class ScpiItemProcessor implements ItemProcessor<BatchDataDto, Scpi> {
     public final Map<String, Scpi> existingScpis = new HashMap<>();
     private final Set<String> scpisInCsv = new HashSet<>();
 
+    public ScpiItemProcessor(ScpiRepository scpiRepository, LocationService locationService, SectorService sectorService, StatYearService statYearService) {
+        this.scpiRepository = scpiRepository;
+        this.locationService = locationService;
+        this.sectorService = sectorService;
+        this.statYearService = statYearService;
+    }
 
     @PostConstruct
     public void init() {
