@@ -1,7 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: logging
   name: scpi-invest-plus-batch
   labels:
     app: scpi-invest-plus-batch
