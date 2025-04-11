@@ -1,4 +1,7 @@
 spring:
+  application:
+    version: 1.0.0
+    name: scpi-invest-plus-batch
   datasource:
     url: jdbc:postgresql://scpi-invest-db:5432/postgres
     username: postgres
@@ -17,13 +20,11 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb://admin:admin@localhost:27017/scpi-invest-partner-db?authSource=admin
-
-  # TODO : SHOULD DEPLOY ELASTIC SEARCH
+      uri: mongodb://admin:admin@scpi-invest-partner-db:27017/scpi-invest-partner-db?authSource=admin
 
   elasticsearch:
-    rest:
-      uris: http://localhost:9200
+    hostname: elasticsearch-batch.logging
+    port: 9200
     connection-timeout: 1000
     read-timeout: 3000
 

@@ -1,0 +1,7 @@
+image:
+  tag: latest
+  repo: mchekini
+  name: scpi-invest-plus-batch
+
+application:
+  environment: int
