@@ -12,6 +12,7 @@ import org.apache.http.HttpHost;
 
 @Configuration
 public class ElasticSearchConfig {
+
     @Value("${spring.elasticsearch.hostname}")
     private String hostname;
     @Value("${spring.elasticsearch.port}")
