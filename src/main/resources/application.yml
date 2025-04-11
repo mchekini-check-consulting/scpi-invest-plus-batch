@@ -24,7 +24,7 @@ spring:
 
   elasticsearch:
     rest:
-      uris: http://elasticsearch-batch.logging:9200
+      uris: http://elasticsearch-batch:9200
     connection-timeout: 1000
     read-timeout: 3000
 
