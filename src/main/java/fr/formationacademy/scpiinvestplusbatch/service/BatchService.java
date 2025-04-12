@@ -1,11 +1,11 @@
 package fr.formationacademy.scpiinvestplusbatch.service;
 
-
 import fr.formationacademy.scpiinvestplusbatch.dto.BatchDataDto;
 import fr.formationacademy.scpiinvestplusbatch.dto.ScpiDto;
 import fr.formationacademy.scpiinvestplusbatch.entity.elastic.CountryDominant;
 import fr.formationacademy.scpiinvestplusbatch.entity.elastic.ScpiDocument;
 import fr.formationacademy.scpiinvestplusbatch.entity.elastic.SectorDominant;
+import fr.formationacademy.scpiinvestplusbatch.entity.mongo.ScpiMongo;
 import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Scpi;
 import fr.formationacademy.scpiinvestplusbatch.entity.postgres.StatYear;
 import fr.formationacademy.scpiinvestplusbatch.mapper.LocationMapper;
@@ -34,9 +34,9 @@ public class BatchService {
     private final LocationMapper locationMapper;
     private final SectorService sectorService;
     private final SectorMapper sectorMapper;
-    private final ScpiIndexService scpiIndexService;
 
-    public BatchService(ScpiRepository scpiRepository, ScpiElasticRepository elasticsearchRepository, LocationService locationService, ScpiMongoRepository scpiMongoRepository, LocationMapper locationMapper, SectorService sectorService, SectorMapper sectorMapper, ScpiIndexService scpiIndexService) {
+
+    public BatchService(ScpiRepository scpiRepository, ScpiElasticRepository elasticsearchRepository, LocationService locationService, ScpiMongoRepository scpiMongoRepository, LocationMapper locationMapper, SectorService sectorService, SectorMapper sectorMapper) {
         this.scpiRepository = scpiRepository;
         this.elasticsearchRepository = elasticsearchRepository;
         this.locationService = locationService;
@@ -44,7 +44,6 @@ public class BatchService {
         this.locationMapper = locationMapper;
         this.sectorService = sectorService;
         this.sectorMapper = sectorMapper;
-        this.scpiIndexService = scpiIndexService;
     }
 
     @Transactional
@@ -74,7 +73,7 @@ public class BatchService {
 
     @Transactional
     public void saveToMongo(Scpi scpi) {
-        Optional<fr.formationacademy.scpiinvestplusbatch.entity.mongo.ScpiDocument> existing =
+        Optional<ScpiMongo> existing =
                 scpiMongoRepository.findByName(scpi.getName());
 
         if (existing.isPresent()) {
@@ -84,8 +83,8 @@ public class BatchService {
 
         BigDecimal sharePrice = scpi.getStatYears().isEmpty() ? null : scpi.getStatYears().get(0).getSharePrice();
 
-        fr.formationacademy.scpiinvestplusbatch.entity.mongo.ScpiDocument document =
-                fr.formationacademy.scpiinvestplusbatch.entity.mongo.ScpiDocument.builder()
+        ScpiMongo document =
+                ScpiMongo.builder()
                         .scpiId(scpi.getId())
                         .name(scpi.getName())
                         .iban(scpi.getIban())
@@ -102,24 +101,25 @@ public class BatchService {
         Optional<ScpiDocument> existing = elasticsearchRepository.findByName(scpi.getName());
 
         BigDecimal distributionRate = null;
+        BigDecimal sharePrice = null;
         if (scpi.getStatYears() != null && !scpi.getStatYears().isEmpty()) {
             StatYear latestStat = Collections.max(
                     scpi.getStatYears(),
                     Comparator.comparing(stat -> stat.getYearStat().getYearStat())
             );
             distributionRate = latestStat.getDistributionRate();
+            sharePrice = latestStat.getSharePrice();
         }
 
         Integer minimumSubscription = scpi.getMinimumSubscription();
         CountryDominant countryDominant = locationService.getCountryDominant(scpi);
         SectorDominant sectorDominant = sectorService.getSectorDominant(scpi);
 
-        scpiIndexService.createIndexIfNotExists();
-
         ScpiDocument document = ScpiDocument.builder()
                 .scpiId(scpi.getId())
                 .name(scpi.getName())
                 .distributionRate(distributionRate)
+                .sharePrice(sharePrice)
                 .subscriptionFeesBigDecimal(scpi.getSubscriptionFees())
                 .managementCosts(scpi.getManagementCosts())
                 .capitalization(scpi.getCapitalization())
@@ -183,6 +183,5 @@ public class BatchService {
                 && Objects.equals(existing.getStatYears(), scpi.getStatYears())
                 && Objects.equals(existing.getSectors(), scpi.getSectors());
     }
-
 
 }

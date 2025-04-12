@@ -29,6 +29,9 @@ public class ScpiDocument {
 
     private BigDecimal distributionRate;
 
+    @Field(type = FieldType.Scaled_Float, scalingFactor = 100)
+    private BigDecimal sharePrice;
+
     private Boolean subscriptionFees;
 
     @Field(type = FieldType.Scaled_Float, scalingFactor = 100)

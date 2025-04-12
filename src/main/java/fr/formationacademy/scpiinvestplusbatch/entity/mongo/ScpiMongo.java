@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ScpiDocument {
+public class ScpiMongo {
 
     @Id
     private String id;
