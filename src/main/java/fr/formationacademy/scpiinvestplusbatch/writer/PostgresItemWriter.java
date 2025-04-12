@@ -1,55 +1,32 @@
 package fr.formationacademy.scpiinvestplusbatch.writer;
 
-import fr.formationacademy.scpiinvestplusbatch.dto.BatchDataDto;
-import fr.formationacademy.scpiinvestplusbatch.service.BatchService;
-import fr.formationacademy.scpiinvestplusbatch.service.LocationService;
-import fr.formationacademy.scpiinvestplusbatch.service.SectorService;
-import fr.formationacademy.scpiinvestplusbatch.service.StatYearService;
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Scpi;
+import jakarta.persistence.EntityManagerFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Component
 @Slf4j
-public class PostgresItemWriter implements ItemWriter<BatchDataDto> {
+public class PostgresItemWriter implements ItemWriter<Scpi> {
 
-    private final BatchService batchService;
-    private final LocationService locationService;
-    private final SectorService sectorService;
-    private final StatYearService statYearService;
+    private final JpaItemWriter<Scpi> delegate;
 
-    public PostgresItemWriter(BatchService batchService, LocationService locationService, SectorService sectorService, StatYearService statYearService) {
-        this.batchService = batchService;
-        this.locationService = locationService;
-        this.sectorService = sectorService;
-        this.statYearService = statYearService;
+    public PostgresItemWriter(EntityManagerFactory entityManagerFactory) {
+        this.delegate = new JpaItemWriter<>();
+        this.delegate.setEntityManagerFactory(entityManagerFactory);
     }
 
-    @Transactional
     @Override
-    public void write(Chunk<? extends BatchDataDto> items) {
-        if (items.isEmpty()) return;
+    public void write(Chunk<? extends Scpi> items) throws Exception {
+        if (items.isEmpty()) {
+            log.info("Aucune SCPI à traiter.");
+            return;
+        }
 
-        List<BatchDataDto> batchDataList = items.getItems().stream()
-                .map(item -> (BatchDataDto) item)
-                .toList();
-        batchService.saveOrUpdateBatchData(batchDataList);
-        batchDataList.forEach(batchData -> {
-            if (batchData.getLocations() != null) {
-                locationService.saveLocations(batchData.getLocations());
-            }
-            if (batchData.getSectors() != null) {
-                sectorService.saveSectors(batchData.getSectors());
-            }
-            if (batchData.getStatYears() != null) {
-                statYearService.saveStatYears(batchData.getStatYears());
-            }
-        });
-
-        log.info("{} SCPI enregistrées en base", batchDataList.size());
+        log.info("Insertion/Mise à jour de {} SCPIs.", items.size());
+        delegate.write(items);
     }
 }
