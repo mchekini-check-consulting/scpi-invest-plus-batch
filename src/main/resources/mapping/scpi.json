@@ -32,6 +32,9 @@
           "keyword": { "type": "keyword" }
         }
       },
+      "scheduledPayment": {
+        "type": "boolean"
+      },
       "minimumSubscription": { "type": "integer" },
       "countryDominant": {
         "type": "object",

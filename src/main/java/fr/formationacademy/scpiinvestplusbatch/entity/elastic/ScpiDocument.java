@@ -20,8 +20,6 @@ import java.util.List;
 public class ScpiDocument {
 
     @Id
-    private String id;
-
     private Integer scpiId;
 
     @Field(type = FieldType.Text, analyzer = "edge_ngram_analyzer", searchAnalyzer = "standard")
@@ -46,6 +44,9 @@ public class ScpiDocument {
 
     @Field(type = FieldType.Text)
     private String frequencyPayment;
+
+    @Field(type = FieldType.Boolean)
+    private Boolean scheduledPayment;
 
     private Integer minimumSubscription;
 
