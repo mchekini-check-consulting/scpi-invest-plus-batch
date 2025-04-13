@@ -57,7 +57,6 @@ public class ScpiItemReader {
                 .build();
     }
 
-
     @Bean
     public JpaPagingItemReader<Scpi> scpiPostgresReader() {
 
@@ -66,8 +65,5 @@ public class ScpiItemReader {
         reader.setQueryString("SELECT s FROM Scpi s");
         reader.setPageSize(20);
         return reader;
-
     }
-
-
 }

@@ -1,8 +1,7 @@
 package fr.formationacademy.scpiinvestplusbatch.writer;
 
-import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Scpi;
+import fr.formationacademy.scpiinvestplusbatch.entity.elastic.ScpiDocument;
 import fr.formationacademy.scpiinvestplusbatch.repository.elastic.ScpiElasticRepository;
-import fr.formationacademy.scpiinvestplusbatch.service.BatchService;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.Chunk;
@@ -10,28 +9,34 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @Slf4j
-public class ElasticItemWriter implements ItemWriter<Scpi> {
+public class ElasticItemWriter implements ItemWriter<ScpiDocument> {
 
     private final ScpiElasticRepository elasticRepository;
-    private final BatchService batchService;
 
-    public ElasticItemWriter(ScpiElasticRepository elasticRepository, BatchService batchService) {
+    public ElasticItemWriter(ScpiElasticRepository elasticRepository) {
         this.elasticRepository = elasticRepository;
-        this.batchService = batchService;
     }
 
     @Override
-    public void write(@NonNull Chunk<? extends Scpi> items) throws Exception {
+    public void write(@NonNull Chunk<? extends ScpiDocument> items) {
         if (!items.isEmpty()) {
-            List<? extends Scpi> scpis = items.getItems();
-            for (Scpi scpi : scpis) {
-                batchService.saveToElastic(scpi);
+            List<? extends ScpiDocument> scpis = items.getItems();
+            for (ScpiDocument scpiElastic : scpis) {
+                Optional<ScpiDocument> existing = elasticRepository.findByName(scpiElastic.getName());
+                if (existing.isPresent()) {
+                    scpiElastic.setId(existing.get().getId());
+                    log.info("Mise à jour de la SCPI '{}' dans ElasticSearch.", scpiElastic.getName());
+                } else {
+                    log.info("Insertion de la nouvelle SCPI '{}' dans ElasticSearch.", scpiElastic.getName());
+                }
+                elasticRepository.save(scpiElastic);
             }
             long documentCount = elasticRepository.count();
-            log.info("Nombre total des Scpis sauvegardées dans la collection ElasticSearch : {}", documentCount);
+            log.info("Nombre total des SCPI dans ElasticSearch : {}", documentCount);
         }
     }
 }

@@ -7,11 +7,11 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
-public class EncodingCorrectionProcessor<T> implements ItemProcessor<T, T> {
+public class ScpiEncodingCorrectionProcessor<T> implements ItemProcessor<T, T> {
 
     private final Map<String, String> replacementMap;
 
-    public EncodingCorrectionProcessor() {
+    public ScpiEncodingCorrectionProcessor() {
         replacementMap = new HashMap<>();
         replacementMap.put("advertising", "é");
     }
