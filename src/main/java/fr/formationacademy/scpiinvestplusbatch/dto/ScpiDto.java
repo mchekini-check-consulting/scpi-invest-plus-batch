@@ -43,7 +43,7 @@ public class ScpiDto {
     @Pattern(regexp = BIC_PATTERN, message = INVALID_BIC)
     private String bic;
 
-    private Boolean scheduledPayment;
+    private String scheduledPayment;
 
     private String frequencyPayment;
 

@@ -28,7 +28,7 @@ public class MongoItemWriter implements ItemWriter<ScpiMongo> {
             for (ScpiMongo scpiMongo : scpis) {
                 Optional<ScpiMongo> existing = mongoRepository.findByName(scpiMongo.getName());
                 if (existing.isPresent()) {
-                    scpiMongo.setId(existing.get().getId());
+                    scpiMongo.setScpiId(existing.get().getScpiId());
                     log.info("Mise à jour de la SCPI '{}' dans MongoDB.", scpiMongo.getName());
                 } else {
                     log.info("Insertion de la nouvelle SCPI '{}' dans MongoDB.", scpiMongo.getName());
