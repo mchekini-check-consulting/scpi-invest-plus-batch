@@ -1,6 +1,5 @@
 
 #TODO : SHOULD USE API DOCKER-COMPOSE
-
 version: '3.8'
 
 services:

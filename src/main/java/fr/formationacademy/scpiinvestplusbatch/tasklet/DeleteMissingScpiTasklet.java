@@ -12,11 +12,13 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 
 @Component
 @Slf4j
@@ -31,23 +33,36 @@ public class DeleteMissingScpiTasklet implements Tasklet {
     @Override
     public RepeatStatus execute(@NotNull StepContribution contribution, ChunkContext chunkContext) throws Exception {
         Set<String> scpiNamesInCsv = new HashSet<>();
+
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(
                 new ClassPathResource("scpi.csv").getInputStream(), StandardCharsets.UTF_8))) {
+
             reader.lines()
                     .skip(1)
-                    .map(line -> line.split(",")[0])
+                    .map(line -> line.split(",")[0].trim().toLowerCase())
                     .forEach(scpiNamesInCsv::add);
+
+        } catch (IOException e) {
+            log.error("Erreur lors de la lecture du fichier CSV", e);
+            throw e;
         }
 
-        List<Scpi> scpisToDelete = scpiRepository.findAll().stream()
-                .filter(scpi -> !scpiNamesInCsv.contains(scpi.getName()))
+        log.info("SCPIs présents dans le CSV : {}", scpiNamesInCsv);
+
+        List<Scpi> allScpis = scpiRepository.findAll();
+        List<Scpi> scpisToDelete = allScpis.stream()
+                .filter(scpi -> !scpiNamesInCsv.contains(scpi.getName().trim().toLowerCase()))
                 .toList();
 
-        if (!scpisToDelete.isEmpty()) {
+        if (scpisToDelete.isEmpty()) {
+            log.info("Aucune SCPI à supprimer.");
+        } else {
+            scpisToDelete.forEach(scpi -> log.info("Suppression prévue: {}", scpi.getName()));
             scpiRepository.deleteAll(scpisToDelete);
-            log.info("{} SCPIs supprimées.", scpisToDelete.size());
+            log.info("{} SCPI(s) supprimée(s) avec succès.", scpisToDelete.size());
         }
 
         return RepeatStatus.FINISHED;
     }
+
 }
