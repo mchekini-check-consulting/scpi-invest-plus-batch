@@ -23,7 +23,7 @@ spring:
       uri: mongodb://admin:admin@scpi-invest-partner-db:27017/scpi-invest-partner-db?authSource=admin
 
   elasticsearch:
-    hostname: elasticsearch-batch.logging
+    hostname: elasticsearch-batch.scpi-invest-plus-int
     port: 9200
     connection-timeout: 1000
     read-timeout: 3000
