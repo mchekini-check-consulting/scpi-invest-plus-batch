@@ -22,5 +22,3 @@ spec:
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: "{{.Values.application.environment }}"
-            - name: ELASTICSEARCH_HOSTNAME
-              value: "{{ .Values.elasticsearch.hostname }}"

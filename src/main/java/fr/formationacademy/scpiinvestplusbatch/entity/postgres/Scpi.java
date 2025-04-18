@@ -27,8 +27,12 @@ public class Scpi {
     private BigDecimal subscriptionFees;
     private BigDecimal managementCosts;
     private Integer enjoymentDelay;
+
+    @Column(unique = true)
     private String iban;
+
     private String bic;
+
     private Boolean scheduledPayment;
     private String frequencyPayment;
     private Float cashback;

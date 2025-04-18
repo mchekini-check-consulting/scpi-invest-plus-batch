@@ -1,25 +1,17 @@
 package fr.formationacademy.scpiinvestplusbatch.reader;
 
 import fr.formationacademy.scpiinvestplusbatch.dto.ScpiDto;
-import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Scpi;
 import fr.formationacademy.scpiinvestplusbatch.enums.ScpiField;
-import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
-import jakarta.persistence.EntityManagerFactory;
+
 import java.nio.charset.StandardCharsets;
 
 @Component
 public class ScpiItemReader {
-
-    private final EntityManagerFactory entityManagerFactory;
-
-    public ScpiItemReader(EntityManagerFactory entityManagerFactory) {
-        this.entityManagerFactory = entityManagerFactory;
-    }
 
     @Bean
     public FlatFileItemReader<ScpiDto> reader() {
@@ -57,13 +49,4 @@ public class ScpiItemReader {
                 .build();
     }
 
-    @Bean
-    public JpaPagingItemReader<Scpi> scpiPostgresReader() {
-
-        JpaPagingItemReader<Scpi> reader = new JpaPagingItemReader<>();
-        reader.setEntityManagerFactory(entityManagerFactory);
-        reader.setQueryString("SELECT s FROM Scpi s");
-        reader.setPageSize(20);
-        return reader;
-    }
 }

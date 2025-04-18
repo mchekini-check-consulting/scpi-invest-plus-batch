@@ -1,78 +1,55 @@
 package fr.formationacademy.scpiinvestplusbatch.writer;
 
-import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Scpi;
-import fr.formationacademy.scpiinvestplusbatch.repository.postgres.ScpiRepository;
+import fr.formationacademy.scpiinvestplusbatch.dto.BatchDataDto;
+import fr.formationacademy.scpiinvestplusbatch.service.BatchService;
+import fr.formationacademy.scpiinvestplusbatch.service.LocationService;
+import fr.formationacademy.scpiinvestplusbatch.service.SectorService;
+import fr.formationacademy.scpiinvestplusbatch.service.StatYearService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
 @Slf4j
-public class PostgresItemWriter implements ItemWriter<Scpi> {
+public class PostgresItemWriter implements ItemWriter<BatchDataDto> {
 
-    private final ScpiRepository scpiRepository;
+    private final BatchService batchService;
+    private final LocationService locationService;
+    private final SectorService sectorService;
+    private final StatYearService statYearService;
 
-    public PostgresItemWriter(ScpiRepository scpiRepository) {
-        this.scpiRepository = scpiRepository;
+    public PostgresItemWriter(BatchService batchService, LocationService locationService, SectorService sectorService, StatYearService statYearService) {
+        this.batchService = batchService;
+        this.locationService = locationService;
+        this.sectorService = sectorService;
+        this.statYearService = statYearService;
     }
 
+    @Transactional
     @Override
-    public void write(Chunk<? extends Scpi> chunk) {
+    public void write(Chunk<? extends BatchDataDto> items) {
+        if (items.isEmpty()) return;
 
-        List<Scpi> newScpiToSave = new ArrayList<>();
-
-        for (Scpi newScpi : chunk.getItems()) {
-            List<Scpi> existedScpi = scpiRepository.findByName(newScpi.getName());
-            if (!existedScpi.isEmpty()) {
-                newScpiToSave.add(updateScpi(existedScpi.get(0), newScpi));
-            } else {
-                newScpiToSave.add(newScpi);
+        List<BatchDataDto> batchDataList = items.getItems().stream()
+                .map(item -> (BatchDataDto) item)
+                .toList();
+        batchService.saveOrUpdateBatchData(batchDataList);
+        batchDataList.forEach(batchData -> {
+            if (batchData.getLocations() != null) {
+                locationService.saveLocations(batchData.getLocations());
             }
-        }
-
-        scpiRepository.saveAll(newScpiToSave);
-        long itemsCount = scpiRepository.count();
-        log.info("Nombre total des SCPI dans la PostgresSql : {}", itemsCount);
-    }
-
-    private Scpi updateScpi(Scpi oldScpi, Scpi newScpi) {
-        oldScpi.getLocations().clear();
-        oldScpi.getLocations().addAll(newScpi.getLocations());
-        oldScpi.getLocations().forEach(loc -> {
-            loc.getId().setScpiId(oldScpi.getId());
-            loc.setScpi(oldScpi);
+            if (batchData.getSectors() != null) {
+                sectorService.saveSectors(batchData.getSectors());
+            }
+            if (batchData.getStatYears() != null) {
+                statYearService.saveStatYears(batchData.getStatYears());
+            }
         });
 
-        oldScpi.getSectors().clear();
-        oldScpi.getSectors().addAll(newScpi.getSectors());
-        oldScpi.getSectors().forEach(sec -> {
-            sec.getId().setScpiId(oldScpi.getId());
-            sec.setScpi(oldScpi);
-        });
-
-        oldScpi.getStatYears().clear();
-        oldScpi.getStatYears().addAll(newScpi.getStatYears());
-        oldScpi.getStatYears().forEach(stat -> {
-            stat.getYearStat().setScpiId(oldScpi.getId());
-            stat.setScpi(oldScpi);
-        });
-        oldScpi.setMinimumSubscription(newScpi.getMinimumSubscription());
-        oldScpi.setManager(newScpi.getManager());
-        oldScpi.setCapitalization(newScpi.getCapitalization());
-        oldScpi.setSubscriptionFees(newScpi.getSubscriptionFees());
-        oldScpi.setManagementCosts(newScpi.getManagementCosts());
-        oldScpi.setEnjoymentDelay(newScpi.getEnjoymentDelay());
-        oldScpi.setIban(newScpi.getIban());
-        oldScpi.setBic(newScpi.getBic());
-        oldScpi.setScheduledPayment(newScpi.getScheduledPayment());
-        oldScpi.setFrequencyPayment(newScpi.getFrequencyPayment());
-        oldScpi.setCashback(newScpi.getCashback());
-        oldScpi.setAdvertising(newScpi.getAdvertising());
-
-        return oldScpi;
+        log.info("{} SCPI enregistrées en base", batchDataList.size());
     }
 }

@@ -23,7 +23,7 @@ public class ScpiRequestFieldSetMapper implements FieldSetMapper<ScpiDto> {
                 .enjoymentDelay(fieldSet.readInt(ScpiField.DELAI_JOUISSANCE.getColumnName()))
                 .iban(fieldSet.readString(ScpiField.IBAN.getColumnName()))
                 .bic(fieldSet.readString(ScpiField.BIC.getColumnName()))
-                .scheduledPayment(fieldSet.readString(ScpiField.VERSEMENT_PROGRAMME.getColumnName()))
+                .scheduledPayment(fieldSet.readBoolean(ScpiField.VERSEMENT_PROGRAMME.getColumnName()))
                 .frequencyPayment(fieldSet.readString(ScpiField.FREQUENCE_LOYERS.getColumnName()))
                 .cashback(fieldSet.readFloat(ScpiField.CASHBACK.getColumnName()))
                 .advertising(fieldSet.readString(ScpiField.PUBLICITE.getColumnName()))

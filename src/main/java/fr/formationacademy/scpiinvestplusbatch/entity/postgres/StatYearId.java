@@ -20,4 +20,9 @@ public class StatYearId implements Serializable {
 
     @Column(name = "scpi_id")
     private Integer scpiId;
+
+    public StatYearId(Integer yearStat) {
+        this.yearStat = yearStat;
+    }
+
 }
