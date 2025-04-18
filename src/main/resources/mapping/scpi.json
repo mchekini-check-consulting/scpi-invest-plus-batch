@@ -3,7 +3,7 @@
       "id": { "type": "keyword" },
       "name": {
         "type": "text",
-        "analyzer": "edge_ngram_analyzer",
+        "analyzer": "custom_folded_analyzer",
         "fields": {
           "keyword": { "type": "keyword" }
         }
@@ -32,15 +32,14 @@
           "keyword": { "type": "keyword" }
         }
       },
-      "scheduledPayment": {
-        "type": "boolean"
-      },
       "minimumSubscription": { "type": "integer" },
+      "scheduledPayment" : {"type":  "boolean"},
       "countryDominant": {
         "type": "object",
         "properties": {
           "country": {
             "type": "text",
+            "analyzer": "custom_folded_analyzer",
             "fields": {
               "keyword": { "type": "keyword" }
             }
@@ -53,6 +52,7 @@
         "properties": {
           "name": {
             "type": "text",
+            "analyzer": "custom_folded_analyzer",
             "fields": {
               "keyword": { "type": "keyword" }
             }
@@ -68,6 +68,7 @@
         "properties": {
           "country": {
             "type": "text",
+            "analyzer": "custom_folded_analyzer",
             "fields": {
               "keyword": { "type": "keyword" }
             }
@@ -80,6 +81,7 @@
         "properties": {
           "name": {
             "type": "text",
+            "analyzer": "custom_folded_analyzer",
             "fields": {
               "keyword": { "type": "keyword" }
             }

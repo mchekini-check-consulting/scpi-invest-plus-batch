@@ -1,19 +1,12 @@
 {
-    "analysis": {
-      "tokenizer": {
-        "edge_ngram_tokenizer": {
-          "type": "edge_ngram",
-          "min_gram": 2,
-          "max_gram": 20,
-          "token_chars": ["letter"]
-        }
-      },
-      "analyzer": {
-        "edge_ngram_analyzer": {
-          "type": "custom",
-          "tokenizer": "edge_ngram_tokenizer",
-          "filter": ["lowercase", "asciifolding"]
-        }
+  "analysis": {
+    "analyzer": {
+      "custom_folded_analyzer": {
+        "type": "custom",
+        "tokenizer": "standard",
+        "filter": ["lowercase", "asciifolding"]
       }
     }
+  }
+
 }

@@ -1,5 +1,6 @@
 package fr.formationacademy.scpiinvestplusbatch.dto;
 
+import fr.formationacademy.scpiinvestplusbatch.entity.postgres.StatYear;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import static fr.formationacademy.scpiinvestplusbatch.utils.Constants.*;
 
@@ -15,6 +17,8 @@ import static fr.formationacademy.scpiinvestplusbatch.utils.Constants.*;
 @NoArgsConstructor
 @Builder
 public class ScpiDto {
+
+    private Integer id;
 
     @NotBlank(message = "Name is required")
     private String name;
@@ -28,10 +32,10 @@ public class ScpiDto {
     @PositiveOrZero(message = "Capitalization must be non-negative")
     private Long capitalization;
 
-    @DecimalMin(value = "0.0", message = "Subscription fees must be non-negative")
+    @DecimalMin(value = "0.0", inclusive = true, message = "Subscription fees must be non-negative")
     private BigDecimal subscriptionFees;
 
-    @DecimalMin(value = "0.0", message = "Management costs must be non-negative")
+    @DecimalMin(value = "0.0", inclusive = true, message = "Management costs must be non-negative")
     private BigDecimal managementCosts;
 
     @Min(value = 0, message = "Enjoyment delay must be non-negative")
@@ -43,7 +47,7 @@ public class ScpiDto {
     @Pattern(regexp = BIC_PATTERN, message = INVALID_BIC)
     private String bic;
 
-    private String scheduledPayment;
+    private Boolean scheduledPayment;
 
     private String frequencyPayment;
 
@@ -51,10 +55,14 @@ public class ScpiDto {
     private Float cashback;
 
     private String advertising;
+    // J'ai besoin de les traiter comme une chaine ici
     private String distributedRate;
     private String sharePrice;
     private String reconstitutionValue;
+
     private String locations;
     private String sectors;
     private Integer statYear;
+
+    private List<StatYear> statYears;
 }

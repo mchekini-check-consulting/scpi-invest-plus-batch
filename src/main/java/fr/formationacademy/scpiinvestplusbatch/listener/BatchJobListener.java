@@ -1,5 +1,8 @@
 package fr.formationacademy.scpiinvestplusbatch.listener;
 
+
+import fr.formationacademy.scpiinvestplusbatch.processor.ScpiItemProcessor;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
@@ -13,7 +16,13 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class BatchJobListener implements JobExecutionListener {
 
+    private final ScpiItemProcessor scpiItemProcessor;
+
     private final Map<Long, Long> jobStartTimes = new ConcurrentHashMap<>();
+
+    public BatchJobListener(ScpiItemProcessor scpiItemProcessor) {
+        this.scpiItemProcessor = scpiItemProcessor;
+    }
 
     @Override
     public void beforeJob(JobExecution jobExecution) {
@@ -46,5 +55,6 @@ public class BatchJobListener implements JobExecutionListener {
             log.error("Batch job '{}' failed! Errors:", jobExecution.getJobInstance().getJobName());
             jobExecution.getAllFailureExceptions().forEach(ex -> log.error("Exception: ", ex));
         }
+        scpiItemProcessor.refreshCache();
     }
 }
