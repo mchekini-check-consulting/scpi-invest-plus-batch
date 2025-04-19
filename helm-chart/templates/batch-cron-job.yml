@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: import-scpi-job
 spec:
-  schedule: "*/5 * * * *"
+  schedule: "*/2 * * * *"
   jobTemplate:
     spec:
       template:
@@ -12,4 +12,9 @@ spec:
             - name: import-scpi-job
               image: "{{.Values.image.repo}}/{{.Values.image.name}}:{{.Values.image.tag}}"
               imagePullPolicy: IfNotPresent
+              env:
+                - name: SPRING_PROFILES_ACTIVE
+                  value: "{{.Values.application.environment }}"
+                - name: ELASTICSEARCH_HOSTNAME
+                  value: "{{ .Values.elasticsearch.hostname }}"
           restartPolicy: OnFailure
