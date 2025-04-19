@@ -3,9 +3,9 @@ spring:
     version: 1.0.0
     name: scpi-invest-plus-batch
   datasource:
-    url: jdbc:postgresql://scpi-invest-db:5432/postgres
+    url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
-    password: postgres
+    password: admin
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 5
@@ -20,10 +20,10 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb://admin:admin@scpi-invest-partner-db:27017/scpi-invest-partner-db?authSource=admin
+      uri: mongodb://admin:admin@localhost:27017/scpi-invest-partner-db?authSource=admin
 
   elasticsearch:
-    hostname: ${ELASTICSEARCH_HOSTNAME}
+    hostname: localhost
     port: 9200
     connection-timeout: 1000
     read-timeout: 3000
