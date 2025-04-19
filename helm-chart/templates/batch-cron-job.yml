@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: import-scpi-job
+spec:
+  schedule: "*/5 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: import-scpi-job
+              image: "{{.Values.image.repo}}/{{.Values.image.name}}:{{.Values.image.tag}}"
+              imagePullPolicy: IfNotPresent
+          restartPolicy: OnFailure
