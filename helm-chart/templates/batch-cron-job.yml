@@ -8,6 +8,7 @@ spec:
     spec:
       template:
         spec:
+          serviceAccountName: import-scpi-sa
           containers:
             - name: import-scpi-job
               image: "{{.Values.image.repo}}/{{.Values.image.name}}:{{.Values.image.tag}}"

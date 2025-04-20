@@ -23,10 +23,14 @@ public class S3FileService {
     }
 
     public InputStream getScpiFileAsStream() {
+        if (bucketName == null || fileKey == null) {
+            throw new IllegalStateException("Bucket name or file key is not set.");
+        }
         GetObjectRequest objectRequest = GetObjectRequest.builder()
                 .bucket(bucketName)
                 .key(fileKey)
                 .build();
         return s3Client.getObject(objectRequest, ResponseTransformer.toInputStream());
     }
+
 }

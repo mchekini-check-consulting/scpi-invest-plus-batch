@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Component;
 import jakarta.persistence.EntityManagerFactory;
-import software.amazon.awssdk.services.s3.S3Client;
 import java.nio.charset.StandardCharsets;
 
 @Component

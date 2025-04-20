@@ -133,6 +133,7 @@
             <version>${lombok.version}</version>
             <optional>true</optional>
         </dependency>
+
         <!-- Amazon S3 sdk -->
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
