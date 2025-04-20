@@ -2,13 +2,13 @@ package fr.formationacademy.scpiinvestplusbatch.tasklet;
 
 import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Scpi;
 import fr.formationacademy.scpiinvestplusbatch.repository.postgres.ScpiRepository;
+import fr.formationacademy.scpiinvestplusbatch.service.S3FileService;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
@@ -25,17 +25,19 @@ import java.util.Set;
 public class DeleteMissingScpiTasklet implements Tasklet {
 
     private final ScpiRepository scpiRepository;
+    private final S3FileService s3FileService;
 
-    public DeleteMissingScpiTasklet(ScpiRepository scpiRepository) {
+    public DeleteMissingScpiTasklet(ScpiRepository scpiRepository, S3FileService s3FileService) {
         this.scpiRepository = scpiRepository;
+        this.s3FileService = s3FileService;
     }
 
     @Override
-    public RepeatStatus execute(@NotNull StepContribution contribution, ChunkContext chunkContext) throws Exception {
+    public RepeatStatus execute(@NotNull StepContribution contribution, @NotNull ChunkContext chunkContext) throws Exception {
         Set<String> scpiNamesInCsv = new HashSet<>();
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                new ClassPathResource("scpi.csv").getInputStream(), StandardCharsets.UTF_8))) {
+                s3FileService.getScpiFileAsStream(), StandardCharsets.UTF_8))) {
 
             reader.lines()
                     .skip(1)
