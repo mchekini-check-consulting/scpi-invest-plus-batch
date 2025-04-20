@@ -28,6 +28,12 @@ spring:
     connection-timeout: 1000
     read-timeout: 3000
 
+  s3:
+    bucket:
+      name: scpi-batch
+    file:
+      key: scpi-data/scpi.csv
+
 management:
   endpoints:
     web:
