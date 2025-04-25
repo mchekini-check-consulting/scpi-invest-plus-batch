@@ -3,33 +3,29 @@ package fr.formationacademy.scpiinvestplusbatch.reader;
 import fr.formationacademy.scpiinvestplusbatch.dto.ScpiDto;
 import fr.formationacademy.scpiinvestplusbatch.entity.postgres.Scpi;
 import fr.formationacademy.scpiinvestplusbatch.enums.ScpiField;
-import fr.formationacademy.scpiinvestplusbatch.service.S3FileService;
 import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import jakarta.persistence.EntityManagerFactory;
-import software.amazon.awssdk.services.s3.S3Client;
 import java.nio.charset.StandardCharsets;
 
 @Component
 public class ScpiItemReader {
 
     private final EntityManagerFactory entityManagerFactory;
-    private final S3FileService s3FileService;
 
-    public ScpiItemReader(EntityManagerFactory entityManagerFactory, S3FileService s3FileService) {
+    public ScpiItemReader(EntityManagerFactory entityManagerFactory) {
         this.entityManagerFactory = entityManagerFactory;
-        this.s3FileService = s3FileService;
     }
 
     @Bean
     public FlatFileItemReader<ScpiDto> reader() {
         return new FlatFileItemReaderBuilder<ScpiDto>()
                 .name("scpiRequestItemReader")
-                .resource(new InputStreamResource(s3FileService.getScpiFileAsStream()))
+                .resource(new ClassPathResource("scpi.csv"))
                 .encoding(StandardCharsets.UTF_8.name())
                 .linesToSkip(1)
                 .delimited()
