@@ -2,6 +2,7 @@ spring:
   application:
     version: 1.0.0
     name: scpi-invest-plus-batch
+
   datasource:
     url: jdbc:postgresql://scpi-invest-db:5432/postgres
     username: postgres
