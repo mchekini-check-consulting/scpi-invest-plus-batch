@@ -45,6 +45,10 @@ public class BatchJobListener implements JobExecutionListener {
         if (jobExecution.getStatus() == BatchStatus.FAILED) {
             log.error("Batch job '{}' failed! Errors:", jobExecution.getJobInstance().getJobName());
             jobExecution.getAllFailureExceptions().forEach(ex -> log.error("Exception: ", ex));
+            System.exit(1);
+        } else {
+            System.exit(0);
         }
     }
+
 }

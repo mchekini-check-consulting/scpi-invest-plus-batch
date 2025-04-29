@@ -10,12 +10,6 @@ spring:
     connection-timeout: 1000
     read-timeout: 3000
 
-  s3:
-    bucket:
-      name: scpi-batch
-    file:
-      key: scpi-data/scpi.csv
-
   data:
     mongodb:
       uri: mongodb://admin:admin@localhost:27017/scpi-invest-partner-db?authSource=admin
